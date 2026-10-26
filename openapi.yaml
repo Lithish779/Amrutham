@@ -1,0 +1,409 @@
+openapi: 3.0.3
+info:
+  title: Amrutam Telemedicine API
+  version: 1.0.0
+  description: |
+    Production-grade telemedicine backend. All write operations that create or change business state require an
+    `Idempotency-Key` header (8-128 chars). Errors use `{ "error": { code, message, details?, requestId } }`.
+servers:
+  - url: http://localhost:8080/api/v1
+tags:
+  - { name: Auth }
+  - { name: Users }
+  - { name: Doctors }
+  - { name: Consultations }
+  - { name: Prescriptions }
+  - { name: Admin }
+  - { name: Webhooks }
+security:
+  - bearerAuth: []
+paths:
+  /auth/register:
+    post:
+      tags: [Auth]
+      security: []
+      summary: Register a patient or doctor (doctors stay unlisted until an admin verifies them)
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/RegisterRequest' } } }
+      responses:
+        '201': { description: Created, content: { application/json: { schema: { $ref: '#/components/schemas/User' } } } }
+        '400': { $ref: '#/components/responses/ValidationError' }
+        '409': { description: Email already registered }
+        '429': { $ref: '#/components/responses/RateLimited' }
+  /auth/login:
+    post:
+      tags: [Auth]
+      security: []
+      summary: Password login. Returns tokens, an MFA challenge, or an MFA-enrolment requirement (doctor/admin).
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, required: [email, password], properties: { email: { type: string, format: email }, password: { type: string } } } } }
+      responses:
+        '200':
+          description: One of TokenResponse, MfaChallenge, MfaEnrollmentRequired
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/TokenResponse'
+                  - $ref: '#/components/schemas/MfaChallenge'
+                  - $ref: '#/components/schemas/MfaEnrollmentRequired'
+        '401': { description: Invalid credentials or account locked }
+        '429': { $ref: '#/components/responses/RateLimited' }
+  /auth/mfa/login:
+    post:
+      tags: [Auth]
+      summary: Complete login with TOTP code or one-time recovery code (Bearer = challengeToken)
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, required: [code], properties: { code: { type: string } } } } }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/TokenResponse' } } } }
+        '401': { description: Invalid code }
+  /auth/mfa/setup:
+    post:
+      tags: [Auth]
+      summary: Generate a TOTP secret (Bearer = setupToken or access token)
+      responses:
+        '200': { description: Secret and otpauth URL, content: { application/json: { schema: { type: object, properties: { secret: { type: string }, otpauthUrl: { type: string } } } } } }
+  /auth/mfa/enable:
+    post:
+      tags: [Auth]
+      summary: Confirm TOTP code, enable MFA, receive tokens and recovery codes
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, required: [code], properties: { code: { type: string, pattern: '^\d{6}$' } } } } }
+      responses:
+        '200': { description: OK }
+        '401': { description: Invalid code }
+  /auth/refresh:
+    post:
+      tags: [Auth]
+      security: []
+      summary: Rotate refresh token. Re-use of a rotated token revokes the whole token family.
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, required: [refreshToken], properties: { refreshToken: { type: string } } } } }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/TokenResponse' } } } }
+        '401': { description: "Invalid, expired or reused token" }
+  /auth/logout:
+    post:
+      tags: [Auth]
+      security: []
+      summary: Revoke refresh-token family
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, required: [refreshToken], properties: { refreshToken: { type: string } } } } }
+      responses:
+        '204': { description: Logged out }
+  /users/me:
+    get:
+      tags: [Users]
+      summary: Current user and profile (PHI decrypted for the owner only)
+      responses:
+        '200': { description: OK }
+    patch:
+      tags: [Users]
+      summary: Update profile (phone/dob are encrypted at rest)
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, properties: { fullName: { type: string }, phone: { type: string }, dob: { type: string, format: date }, gender: { type: string }, language: { type: string } } } } }
+      responses:
+        '200': { description: OK }
+  /doctors:
+    get:
+      tags: [Doctors]
+      security: []
+      summary: Search and filter verified doctors (keyset pagination, cached 30s)
+      parameters:
+        - { name: q, in: query, schema: { type: string } }
+        - { name: specialization, in: query, schema: { type: string } }
+        - { name: language, in: query, schema: { type: string } }
+        - { name: minRating, in: query, schema: { type: number } }
+        - { name: minFee, in: query, schema: { type: integer }, description: paise }
+        - { name: maxFee, in: query, schema: { type: integer }, description: paise }
+        - { name: availableFrom, in: query, schema: { type: string, format: date-time } }
+        - { name: availableTo, in: query, schema: { type: string, format: date-time } }
+        - { name: sort, in: query, schema: { type: string, enum: [rating, fee_asc, experience], default: rating } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 50, default: 20 } }
+        - { name: cursor, in: query, schema: { type: string } }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/DoctorPage' } } } }
+  /doctors/{id}:
+    get:
+      tags: [Doctors]
+      security: []
+      parameters: [{ $ref: '#/components/parameters/Id' }]
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/Doctor' } } } }
+        '404': { description: Not found or unverified }
+  /doctors/{id}/slots:
+    get:
+      tags: [Doctors]
+      security: []
+      summary: Bookable (AVAILABLE) slots in a date range (max 31 days)
+      parameters:
+        - { $ref: '#/components/parameters/Id' }
+        - { name: from, in: query, schema: { type: string, format: date-time } }
+        - { name: to, in: query, schema: { type: string, format: date-time } }
+      responses:
+        '200': { description: OK }
+  /doctors/me/profile:
+    patch:
+      tags: [Doctors]
+      summary: Update own doctor profile (role doctor)
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object } } }
+      responses:
+        '200': { description: OK }
+  /doctors/me/slots:
+    get:
+      tags: [Doctors]
+      summary: List own slots, all statuses (role doctor)
+      responses:
+        '200': { description: OK }
+    post:
+      tags: [Doctors]
+      summary: Create up to 50 availability slots atomically (role doctor)
+      parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [slots]
+              properties:
+                slots:
+                  type: array
+                  maxItems: 50
+                  items: { type: object, required: [startTime, endTime], properties: { startTime: { type: string, format: date-time }, endTime: { type: string, format: date-time } } }
+      responses:
+        '201': { description: Created }
+        '409': { description: Overlaps an existing slot (SLOT_OVERLAP) }
+  /doctors/me/slots/{id}:
+    delete:
+      tags: [Doctors]
+      summary: Cancel an AVAILABLE slot (role doctor)
+      parameters: [{ $ref: '#/components/parameters/Id' }]
+      responses:
+        '204': { description: Cancelled }
+        '409': { description: Slot is held/booked }
+  /consultations:
+    post:
+      tags: [Consultations]
+      summary: Book a slot (role patient). Starts the booking saga; consultation is PENDING_PAYMENT until the payment webhook confirms.
+      parameters: [{ $ref: '#/components/parameters/IdempotencyKey' }]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, required: [slotId], properties: { slotId: { type: string, format: uuid }, reason: { type: string, maxLength: 1000 } } } } }
+      responses:
+        '201': { description: Booked, content: { application/json: { schema: { $ref: '#/components/schemas/BookingResponse' } } } }
+        '404': { description: Slot not found }
+        '409': { description: SLOT_UNAVAILABLE | PATIENT_OVERLAP | REQUEST_IN_PROGRESS }
+        '422': { description: IDEMPOTENCY_KEY_REUSED }
+        '503': { description: Payment provider unavailable; slot released }
+    get:
+      tags: [Consultations]
+      summary: "List own consultations (admin: all, metadata only)"
+      parameters:
+        - { name: status, in: query, schema: { type: string } }
+        - { name: limit, in: query, schema: { type: integer, default: 20 } }
+        - { name: cursor, in: query, schema: { type: string } }
+      responses:
+        '200': { description: OK }
+  /consultations/{id}:
+    get:
+      tags: [Consultations]
+      summary: Get consultation. Reason/notes (PHI) are returned to participants only and the read is audited.
+      parameters: [{ $ref: '#/components/parameters/Id' }]
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/Consultation' } } } }
+        '404': { description: Not found }
+  /consultations/{id}/cancel:
+    post:
+      tags: [Consultations]
+      parameters: [{ $ref: '#/components/parameters/Id' }, { $ref: '#/components/parameters/IdempotencyKey' }]
+      requestBody:
+        content: { application/json: { schema: { type: object, properties: { reason: { type: string } } } } }
+      responses:
+        '200': { description: Cancelled; refund queued per policy }
+        '409': { description: INVALID_STATE_TRANSITION }
+  /consultations/{id}/start:
+    post:
+      tags: [Consultations]
+      summary: Start (doctor, from 10 minutes before the slot)
+      parameters: [{ $ref: '#/components/parameters/Id' }]
+      responses:
+        '200': { description: IN_PROGRESS }
+        '409': { description: TOO_EARLY | SLOT_ENDED | INVALID_STATE_TRANSITION }
+  /consultations/{id}/complete:
+    post:
+      tags: [Consultations]
+      summary: Complete with encrypted clinical notes (doctor)
+      parameters: [{ $ref: '#/components/parameters/Id' }]
+      requestBody:
+        content: { application/json: { schema: { type: object, properties: { notes: { type: string } } } } }
+      responses:
+        '200': { description: COMPLETED }
+  /consultations/{id}/prescription:
+    post:
+      tags: [Prescriptions]
+      summary: Issue prescription (doctor of the consultation, started or completed). One per consultation.
+      parameters: [{ $ref: '#/components/parameters/Id' }, { $ref: '#/components/parameters/IdempotencyKey' }]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/PrescriptionRequest' } } }
+      responses:
+        '201': { description: Created }
+        '409': { description: PRESCRIPTION_EXISTS | INVALID_STATE_TRANSITION }
+    get:
+      tags: [Prescriptions]
+      summary: Read prescription (patient or doctor of the consultation; audited). Admins are denied.
+      parameters: [{ $ref: '#/components/parameters/Id' }]
+      responses:
+        '200': { description: OK }
+        '404': { description: Not found }
+  /prescriptions:
+    get:
+      tags: [Prescriptions]
+      summary: Patient's prescription index (no PHI)
+      responses:
+        '200': { description: OK }
+  /admin/analytics/overview:
+    get:
+      tags: [Admin]
+      summary: Consultations by status, daily series, revenue, top doctors (cached 60s, served from read replica)
+      parameters:
+        - { name: from, in: query, schema: { type: string, format: date-time } }
+        - { name: to, in: query, schema: { type: string, format: date-time } }
+      responses:
+        '200': { description: OK }
+  /admin/users:
+    get:
+      tags: [Admin]
+      responses:
+        '200': { description: OK }
+  /admin/users/{id}/status:
+    patch:
+      tags: [Admin]
+      summary: Disable/enable user; disabling revokes sessions immediately
+      parameters: [{ $ref: '#/components/parameters/Id' }, { $ref: '#/components/parameters/IdempotencyKey' }]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, required: [status], properties: { status: { type: string, enum: [ACTIVE, DISABLED] } } } } }
+      responses:
+        '200': { description: OK }
+  /admin/doctors/{id}/verification:
+    post:
+      tags: [Admin]
+      summary: Verify / unverify a doctor (controls public listing and bookability)
+      parameters: [{ $ref: '#/components/parameters/Id' }, { $ref: '#/components/parameters/IdempotencyKey' }]
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, required: [verified], properties: { verified: { type: boolean } } } } }
+      responses:
+        '200': { description: OK }
+  /admin/audit-logs:
+    get:
+      tags: [Admin]
+      summary: Query the append-only audit trail (the query itself is audited)
+      responses:
+        '200': { description: OK }
+  /admin/audit-logs/verify:
+    get:
+      tags: [Admin]
+      summary: Recompute the audit hash chain and report tampering
+      responses:
+        '200': { description: '{ ok, checked, brokenAt? }' }
+  /webhooks/payments:
+    post:
+      tags: [Webhooks]
+      security: []
+      summary: "Payment provider callback. HMAC-SHA256(`${timestamp}.${rawBody}`) in X-Webhook-Signature; de-duplicated by event id."
+      parameters:
+        - { name: X-Webhook-Timestamp, in: header, required: true, schema: { type: string } }
+        - { name: X-Webhook-Signature, in: header, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content: { application/json: { schema: { type: object, required: [id, type, providerRef], properties: { id: { type: string }, type: { type: string, enum: [payment.succeeded, payment.failed] }, providerRef: { type: string } } } } }
+      responses:
+        '200': { description: Applied or duplicate }
+        '401': { description: Bad signature / stale timestamp }
+components:
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer, bearerFormat: JWT }
+  parameters:
+    Id: { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      schema: { type: string, minLength: 8, maxLength: 128 }
+      description: Client-generated unique key (UUID recommended). Replays return the original response.
+  responses:
+    ValidationError: { description: Invalid request, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+    RateLimited: { description: Too many requests (Retry-After header set) }
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties: { code: { type: string }, message: { type: string }, details: { type: array, items: { type: object } }, requestId: { type: string } }
+    User:
+      type: object
+      properties: { id: { type: string, format: uuid }, email: { type: string }, role: { type: string, enum: [patient, doctor, admin] }, mfaEnabled: { type: boolean } }
+    RegisterRequest:
+      type: object
+      required: [email, password, fullName]
+      properties:
+        email: { type: string, format: email }
+        password: { type: string, minLength: 10 }
+        fullName: { type: string }
+        role: { type: string, enum: [patient, doctor], default: patient }
+        doctor:
+          type: object
+          properties: { specialization: { type: string }, qualifications: { type: string }, experienceYears: { type: integer }, consultationFeePaise: { type: integer }, languages: { type: array, items: { type: string } }, bio: { type: string } }
+    TokenResponse:
+      type: object
+      properties: { accessToken: { type: string }, refreshToken: { type: string }, tokenType: { type: string }, expiresIn: { type: integer }, user: { $ref: '#/components/schemas/User' } }
+    MfaChallenge:
+      type: object
+      properties: { mfaRequired: { type: boolean }, challengeToken: { type: string } }
+    MfaEnrollmentRequired:
+      type: object
+      properties: { mfaEnrollmentRequired: { type: boolean }, setupToken: { type: string } }
+    Doctor:
+      type: object
+      properties: { id: { type: string }, name: { type: string }, specialization: { type: string }, experienceYears: { type: integer }, consultationFeePaise: { type: integer }, languages: { type: array, items: { type: string } }, rating: { type: number }, ratingCount: { type: integer } }
+    DoctorPage:
+      type: object
+      properties: { items: { type: array, items: { $ref: '#/components/schemas/Doctor' } }, nextCursor: { type: string, nullable: true } }
+    Consultation:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        patientId: { type: string }
+        doctorId: { type: string }
+        slotId: { type: string }
+        status: { type: string, enum: [PENDING_PAYMENT, CONFIRMED, IN_PROGRESS, COMPLETED, CANCELLED, EXPIRED, NO_SHOW] }
+        scheduledStart: { type: string, format: date-time }
+        scheduledEnd: { type: string, format: date-time }
+    BookingResponse:
+      type: object
+      properties:
+        consultation: { $ref: '#/components/schemas/Consultation' }
+        payment: { type: object, nullable: true, properties: { id: { type: string }, status: { type: string }, amountPaise: { type: integer }, currency: { type: string }, clientSecret: { type: string }, expiresInSeconds: { type: integer } } }
+    PrescriptionRequest:
+      type: object
+      required: [diagnosis, medications]
+      properties:
+        diagnosis: { type: string }
+        medications:
+          type: array
+          items: { type: object, required: [name, dosage, frequency, durationDays], properties: { name: { type: string }, dosage: { type: string }, frequency: { type: string }, durationDays: { type: integer } } }
+        instructions: { type: string }

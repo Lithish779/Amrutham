@@ -1,0 +1,111 @@
+apiVersion: v1
+kind: Namespace
+metadata: { name: amrutam }
+---
+apiVersion: v1
+kind: ConfigMap
+metadata: { name: amrutam-config, namespace: amrutam }
+data:
+  NODE_ENV: production
+  RUN_WORKER_IN_API: "false"
+  SLOT_HOLD_SECONDS: "600"
+  OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector.observability:4318
+---
+# Secrets come from AWS Secrets Manager via External Secrets (never committed). Keys: DATABASE_URL, DATABASE_READ_URL,
+# REDIS_URL, JWT_ACCESS_SECRET, ENCRYPTION_KEYS, ENCRYPTION_ACTIVE_KEY_ID, PAYMENT_WEBHOOK_SECRET, METRICS_TOKEN
+apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
+metadata: { name: amrutam-secrets, namespace: amrutam }
+spec:
+  refreshInterval: 1h
+  secretStoreRef: { name: aws-secrets-manager, kind: ClusterSecretStore }
+  target: { name: amrutam-secrets }
+  dataFrom: [{ extract: { key: prod/amrutam/api } }]
+---
+apiVersion: batch/v1
+kind: Job
+metadata: { name: amrutam-migrate, namespace: amrutam }
+spec:
+  backoffLimit: 2
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: migrate
+          image: ghcr.io/OWNER/amrutam:SHA
+          command: ["node", "scripts/migrate.js"]
+          envFrom: [{ secretRef: { name: amrutam-secrets } }]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: amrutam-api, namespace: amrutam }
+spec:
+  replicas: 6
+  strategy: { type: RollingUpdate, rollingUpdate: { maxUnavailable: 0, maxSurge: 25% } }
+  selector: { matchLabels: { app: amrutam-api } }
+  template:
+    metadata:
+      labels: { app: amrutam-api }
+      annotations: { prometheus.io/scrape: "true", prometheus.io/port: "8080", prometheus.io/path: /metrics }
+    spec:
+      securityContext: { runAsNonRoot: true, runAsUser: 1000, seccompProfile: { type: RuntimeDefault } }
+      topologySpreadConstraints:
+        - { maxSkew: 1, topologyKey: topology.kubernetes.io/zone, whenUnsatisfiable: DoNotSchedule, labelSelector: { matchLabels: { app: amrutam-api } } }
+      terminationGracePeriodSeconds: 40
+      containers:
+        - name: api
+          image: ghcr.io/OWNER/amrutam:SHA
+          ports: [{ containerPort: 8080 }]
+          envFrom: [{ configMapRef: { name: amrutam-config } }, { secretRef: { name: amrutam-secrets } }]
+          resources: { requests: { cpu: 500m, memory: 384Mi }, limits: { cpu: "1", memory: 768Mi } }
+          securityContext: { allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: { drop: [ALL] } }
+          readinessProbe: { httpGet: { path: /readyz, port: 8080 }, periodSeconds: 5, failureThreshold: 2 }
+          livenessProbe: { httpGet: { path: /healthz, port: 8080 }, periodSeconds: 10, failureThreshold: 3 }
+          lifecycle: { preStop: { exec: { command: ["sleep", "8"] } } }   # let the LB deregister before SIGTERM drain
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: amrutam-worker, namespace: amrutam }
+spec:
+  replicas: 2
+  selector: { matchLabels: { app: amrutam-worker } }
+  template:
+    metadata: { labels: { app: amrutam-worker } }
+    spec:
+      securityContext: { runAsNonRoot: true, runAsUser: 1000 }
+      containers:
+        - name: worker
+          image: ghcr.io/OWNER/amrutam:SHA
+          command: ["node", "-r", "./src/tracing.js", "src/worker.js"]
+          envFrom: [{ configMapRef: { name: amrutam-config } }, { secretRef: { name: amrutam-secrets } }]
+          resources: { requests: { cpu: 250m, memory: 256Mi }, limits: { cpu: 500m, memory: 512Mi } }
+          securityContext: { allowPrivilegeEscalation: false, readOnlyRootFilesystem: true, capabilities: { drop: [ALL] } }
+---
+apiVersion: v1
+kind: Service
+metadata: { name: amrutam-api, namespace: amrutam }
+spec: { selector: { app: amrutam-api }, ports: [{ port: 80, targetPort: 8080 }] }
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata: { name: amrutam-api, namespace: amrutam }
+spec:
+  scaleTargetRef: { apiVersion: apps/v1, kind: Deployment, name: amrutam-api }
+  minReplicas: 6
+  maxReplicas: 40
+  metrics: [{ type: Resource, resource: { name: cpu, target: { type: Utilization, averageUtilization: 60 } } }]
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata: { name: amrutam-api, namespace: amrutam }
+spec: { minAvailable: 4, selector: { matchLabels: { app: amrutam-api } } }
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: { name: default-deny-ingress, namespace: amrutam }
+spec:
+  podSelector: {}
+  policyTypes: [Ingress]
+  ingress:
+    - from: [{ namespaceSelector: { matchLabels: { name: ingress } } }, { namespaceSelector: { matchLabels: { name: observability } } }]
+      ports: [{ port: 8080 }]

@@ -1,0 +1,42 @@
+groups:
+  - name: amrutam-slo
+    rules:
+      - alert: ReadLatencyP95High
+        expr: histogram_quantile(0.95, sum by (le) (rate(http_request_duration_seconds_bucket{method="GET"}[5m]))) > 0.2
+        for: 10m
+        labels: { severity: page }
+        annotations: { summary: "p95 read latency above 200ms SLO" }
+      - alert: WriteLatencyP95High
+        expr: histogram_quantile(0.95, sum by (le) (rate(http_request_duration_seconds_bucket{method=~"POST|PATCH|DELETE"}[5m]))) > 0.5
+        for: 10m
+        labels: { severity: page }
+        annotations: { summary: "p95 write latency above 500ms SLO" }
+      - alert: ErrorBudgetFastBurn            # 99.95% availability => 0.05% budget; 14.4x burn over 1h
+        expr: sum(rate(http_request_duration_seconds_count{status=~"5.."}[1h])) / sum(rate(http_request_duration_seconds_count[1h])) > (14.4 * 0.0005)
+        for: 5m
+        labels: { severity: page }
+        annotations: { summary: "Burning 99.95% availability error budget 14x too fast" }
+      - alert: ErrorBudgetSlowBurn
+        expr: sum(rate(http_request_duration_seconds_count{status=~"5.."}[6h])) / sum(rate(http_request_duration_seconds_count[6h])) > (6 * 0.0005)
+        for: 30m
+        labels: { severity: ticket }
+        annotations: { summary: "Slow burn of availability error budget" }
+      - alert: AuditWriteFailures
+        expr: increase(audit_write_failures_total[5m]) > 0
+        labels: { severity: page }
+        annotations: { summary: "Audit trail writes are failing (compliance risk)" }
+      - alert: SagaCompensationSpike
+        expr: sum(rate(saga_compensations_total[10m])) > 0.5
+        for: 10m
+        labels: { severity: ticket }
+        annotations: { summary: "Unusual number of booking compensations - check payment provider" }
+      - alert: AuthAttackSuspected
+        expr: sum(rate(auth_events_total{event=~"login_failed|refresh_reuse|mfa_failed"}[5m])) > 5
+        for: 5m
+        labels: { severity: ticket }
+        annotations: { summary: "Elevated auth failures / token reuse" }
+      - alert: JobFailures
+        expr: sum(rate(jobs_processed_total{result="error"}[10m])) > 0.1
+        for: 10m
+        labels: { severity: ticket }
+        annotations: { summary: "Async jobs failing" }

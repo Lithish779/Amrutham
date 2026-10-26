@@ -1,0 +1,49 @@
+{
+  "name": "amrutam-telemedicine-backend",
+  "version": "1.0.0",
+  "description": "Production-grade telemedicine backend: auth/MFA/RBAC, booking saga, prescriptions, search, audit trail, analytics",
+  "main": "src/server.js",
+  "license": "MIT",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "start": "node -r ./src/tracing.js src/server.js",
+    "start:worker": "node -r ./src/tracing.js src/worker.js",
+    "dev": "node --watch -r ./src/tracing.js src/server.js",
+    "migrate": "node scripts/migrate.js",
+    "seed": "node scripts/seed.js",
+    "rotate-keys": "node scripts/rotate-keys.js",
+    "lint": "eslint src tests scripts",
+    "test": "jest --runInBand --forceExit",
+    "test:unit": "jest --runInBand --forceExit tests/unit",
+    "test:ci": "jest --runInBand --forceExit --coverage"
+  },
+  "dependencies": {
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/auto-instrumentations-node": "^0.52.0",
+    "@opentelemetry/exporter-trace-otlp-http": "^0.55.0",
+    "@opentelemetry/sdk-node": "^0.55.0",
+    "bcryptjs": "^2.4.3",
+    "bullmq": "^5.12.0",
+    "cors": "^2.8.5",
+    "express": "^4.21.0",
+    "helmet": "^8.0.0",
+    "ioredis": "^5.4.1",
+    "jsonwebtoken": "^9.0.2",
+    "otplib": "^12.0.1",
+    "pg": "^8.12.0",
+    "pino": "^9.4.0",
+    "pino-http": "^10.3.0",
+    "prom-client": "^15.1.3",
+    "swagger-ui-express": "^5.0.1",
+    "yaml": "^2.5.1",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@apidevtools/swagger-parser": "^10.1.0",
+    "eslint": "^9.10.0",
+    "@eslint/js": "^9.10.0",
+    "globals": "^15.9.0",
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0"
+  }
+}

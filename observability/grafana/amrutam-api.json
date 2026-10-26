@@ -1,0 +1,188 @@
+{
+ "title": "Amrutam API",
+ "uid": "amrutam-api",
+ "schemaVersion": 39,
+ "refresh": "10s",
+ "time": {
+  "from": "now-1h",
+  "to": "now"
+ },
+ "panels": [
+  {
+   "id": 1,
+   "type": "timeseries",
+   "title": "Request rate by route",
+   "gridPos": {
+    "x": 0,
+    "y": 0,
+    "w": 12,
+    "h": 8
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "reqps"
+    }
+   },
+   "targets": [
+    {
+     "expr": "sum by (route) (rate(http_request_duration_seconds_count[1m]))",
+     "legendFormat": "{{route}}"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "type": "timeseries",
+   "title": "p95 latency (reads, SLO 200ms)",
+   "gridPos": {
+    "x": 12,
+    "y": 0,
+    "w": 12,
+    "h": 8
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "s"
+    }
+   },
+   "targets": [
+    {
+     "expr": "histogram_quantile(0.95, sum by (le,route) (rate(http_request_duration_seconds_bucket{method=\"GET\"}[5m])))",
+     "legendFormat": "{{route}}"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "type": "timeseries",
+   "title": "p95 latency (writes, SLO 500ms)",
+   "gridPos": {
+    "x": 0,
+    "y": 8,
+    "w": 12,
+    "h": 8
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "s"
+    }
+   },
+   "targets": [
+    {
+     "expr": "histogram_quantile(0.95, sum by (le,route) (rate(http_request_duration_seconds_bucket{method=~\"POST|PATCH|DELETE\"}[5m])))",
+     "legendFormat": "{{route}}"
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "type": "timeseries",
+   "title": "5xx ratio (SLO 0.05%)",
+   "gridPos": {
+    "x": 12,
+    "y": 8,
+    "w": 12,
+    "h": 8
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "percentunit"
+    }
+   },
+   "targets": [
+    {
+     "expr": "sum(rate(http_request_duration_seconds_count{status=~\"5..\"}[5m]))/sum(rate(http_request_duration_seconds_count[5m]))",
+     "legendFormat": "{{route}}"
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "type": "timeseries",
+   "title": "Bookings by result",
+   "gridPos": {
+    "x": 0,
+    "y": 16,
+    "w": 12,
+    "h": 8
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "ops"
+    }
+   },
+   "targets": [
+    {
+     "expr": "sum by (result) (rate(bookings_total[5m]))",
+     "legendFormat": "{{route}}"
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "type": "timeseries",
+   "title": "Saga compensations",
+   "gridPos": {
+    "x": 12,
+    "y": 16,
+    "w": 12,
+    "h": 8
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "ops"
+    }
+   },
+   "targets": [
+    {
+     "expr": "sum by (reason) (rate(saga_compensations_total[5m]))",
+     "legendFormat": "{{route}}"
+    }
+   ]
+  },
+  {
+   "id": 7,
+   "type": "timeseries",
+   "title": "DB query p95",
+   "gridPos": {
+    "x": 0,
+    "y": 24,
+    "w": 12,
+    "h": 8
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "s"
+    }
+   },
+   "targets": [
+    {
+     "expr": "histogram_quantile(0.95, sum by (le,pool) (rate(db_query_duration_seconds_bucket[5m])))",
+     "legendFormat": "{{route}}"
+    }
+   ]
+  },
+  {
+   "id": 8,
+   "type": "timeseries",
+   "title": "Auth events / rate limited / idempotent replays",
+   "gridPos": {
+    "x": 12,
+    "y": 24,
+    "w": 12,
+    "h": 8
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "ops"
+    }
+   },
+   "targets": [
+    {
+     "expr": "sum by (event) (rate(auth_events_total[5m]))",
+     "legendFormat": "{{route}}"
+    }
+   ]
+  }
+ ]
+}
