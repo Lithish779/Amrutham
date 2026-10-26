@@ -42,7 +42,7 @@ jobs:
       - name: Dependency audit (fails on high/critical)
         run: npm audit --omit=dev --audit-level=high
       - name: Secret scan
-        uses: gitleaks/gitleaks-action@v2
+        uses: gitleaks/gitleaks-action@v3
         env: { GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
   image:
     needs: [test, security]
