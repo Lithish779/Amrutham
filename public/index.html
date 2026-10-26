@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Amrutam Telemedicine | Ancient Wisdom, Modern Healthcare</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <!-- Ambient background glow elements -->
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+  <div class="ambient-glow glow-3"></div>
+
+  <!-- Main Top Navigation -->
+  <header class="top-header">
+    <div class="nav-container">
+      <div class="brand">
+        <div class="brand-logo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" fill="rgba(16,185,129,0.15)"/>
+            <path d="M12 6v12M6 12h12" stroke="#10b981" stroke-linecap="round"/>
+            <circle cx="12" cy="12" r="3" fill="#34d399"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">AMRUTAM</span>
+          <span class="brand-subtitle">TELEMEDICINE PLATFORM</span>
+        </div>
+      </div>
+
+      <nav class="nav-links">
+        <button class="nav-btn active" data-tab="doctors">
+          <span class="nav-icon">👨‍⚕️</span> Find Doctors
+        </button>
+        <button class="nav-btn" data-tab="consultations">
+          <span class="nav-icon">📋</span> Consultations & Rx
+        </button>
+        <button class="nav-btn" data-tab="security">
+          <span class="nav-icon">🛡️</span> Security & Audit
+        </button>
+        <button class="nav-btn" data-tab="analytics">
+          <span class="nav-icon">📊</span> Admin Analytics
+        </button>
+        <button class="nav-btn" data-tab="api">
+          <span class="nav-icon">⚡</span> API Playground
+        </button>
+      </nav>
+
+      <div class="header-actions">
+        <div class="live-status-pill" id="system-health-pill">
+          <span class="pulse-dot"></span>
+          <span class="status-text">99.95% Uptime • p95 142ms</span>
+        </div>
+        <a href="/docs" target="_blank" class="docs-btn">
+          <span>Swagger Docs</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <div class="hero-tag">
+        <span class="hero-badge">ENTERPRISE TELEMEDICINE BACKEND</span>
+        <span class="hero-meta">100k Daily Consultations • AES-256-GCM PHI • Multi-AZ Saga</span>
+      </div>
+      <h1 class="hero-headline">Ayurvedic Healthcare Meets <span class="gradient-text">Fault-Tolerant Engineering</span></h1>
+      <p class="hero-description">
+        Experience zero-double-booking consultations, end-to-end encrypted medical records, tamper-evident SHA-256 audit trails, and sub-200ms catalog search powered by PostgreSQL and Node.js.
+      </p>
+    </div>
+  </section>
+
+  <!-- Main Content Tabs Container -->
+  <main class="main-container">
+
+    <!-- TAB 1: DOCTORS SEARCH & BOOKING -->
+    <div id="tab-doctors" class="tab-pane active">
+      <div class="section-header">
+        <div>
+          <h2>Available Specialists</h2>
+          <p class="section-sub">Verified Ayurvedic practitioners with real-time slot scheduling</p>
+        </div>
+        <div class="filters-bar">
+          <div class="search-box">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input type="text" id="doctor-search-input" placeholder="Search doctor name or specialization...">
+          </div>
+          <div class="filter-pills" id="specialization-filters">
+            <button class="pill active" data-spec="all">All</button>
+            <button class="pill" data-spec="Ayurveda">Ayurveda</button>
+            <button class="pill" data-spec="Dermatology">Dermatology</button>
+            <button class="pill" data-spec="Panchakarma">Panchakarma</button>
+            <button class="pill" data-spec="Kayachikitsa">Kayachikitsa</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="doctors-grid" id="doctors-list">
+        <!-- Rendered dynamically by JavaScript -->
+      </div>
+    </div>
+
+    <!-- TAB 2: CONSULTATIONS & PRESCRIPTIONS -->
+    <div id="tab-consultations" class="tab-pane">
+      <div class="section-header">
+        <div>
+          <h2>Active Consultation & Digital Prescription</h2>
+          <p class="section-sub">End-to-end lifecycle from HELD reservation to AES-256-GCM decrypted prescription</p>
+        </div>
+        <div class="action-buttons">
+          <button class="btn btn-secondary" id="btn-refresh-consultations">↻ Refresh Status</button>
+        </div>
+      </div>
+
+      <!-- Saga State Machine Visualization -->
+      <div class="card saga-card">
+        <h3 class="card-title">Orchestrated Saga State Flow</h3>
+        <div class="saga-stepper">
+          <div class="step completed">
+            <div class="step-circle">✓</div>
+            <div class="step-label">AVAILABLE</div>
+            <div class="step-sub">Slot CAS Claimed</div>
+          </div>
+          <div class="step-connector active"></div>
+          <div class="step completed">
+            <div class="step-circle">✓</div>
+            <div class="step-label">HELD (10m)</div>
+            <div class="step-sub">Protected Hold</div>
+          </div>
+          <div class="step-connector active"></div>
+          <div class="step completed">
+            <div class="step-circle">✓</div>
+            <div class="step-label">PENDING_PAYMENT</div>
+            <div class="step-sub">Intent Created</div>
+          </div>
+          <div class="step-connector active"></div>
+          <div class="step active">
+            <div class="step-circle">●</div>
+            <div class="step-label">CONFIRMED</div>
+            <div class="step-sub">Webhook Verified</div>
+          </div>
+          <div class="step-connector"></div>
+          <div class="step">
+            <div class="step-circle">○</div>
+            <div class="step-label">COMPLETED</div>
+            <div class="step-sub">Rx Issued</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Active Consultation Details -->
+      <div class="consultation-layout">
+        <div class="card consultation-detail-card">
+          <div class="consultation-header">
+            <div>
+              <span class="badge badge-success">CONFIRMED & SCHEDULED</span>
+              <h3 style="margin-top: 8px;">Consultation with Dr. Asha Verma</h3>
+              <p class="text-muted">Chief Ayurvedic Physician • BAMS, MD (Ayurveda)</p>
+            </div>
+            <div class="booking-price">
+              <span class="price-val">₹750</span>
+              <span class="price-label">PAID (INR)</span>
+            </div>
+          </div>
+
+          <div class="consult-meta-grid">
+            <div class="meta-item">
+              <span class="meta-title">Time Window</span>
+              <span class="meta-value">Today, 03:30 PM - 04:00 PM (IST)</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-title">Idempotency Key</span>
+              <span class="meta-value font-mono">idem-99214-482f8a</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-title">Consultation ID</span>
+              <span class="meta-value font-mono">c7810b42-19e4-4a52-b883</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-title">Payment Provider Ref</span>
+              <span class="meta-value font-mono">pi_mock_9934182937</span>
+            </div>
+          </div>
+
+          <div class="consult-reason-box">
+            <div class="phi-badge">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              RESTRICTED PHI (AES-256-GCM AT REST)
+            </div>
+            <p style="margin-top: 6px; font-size: 0.95rem;"><strong>Patient Symptoms:</strong> Chronic digestive sluggishness, joint stiffness during winter, and disturbed sleep patterns.</p>
+          </div>
+        </div>
+
+        <!-- Encrypted Prescription Card -->
+        <div class="card prescription-card">
+          <div class="prescription-header">
+            <div>
+              <h3 class="card-title">Digital Prescription #RX-8820</h3>
+              <p class="text-muted">Issued by Dr. Asha Verma • Council Reg: AYUR-84729</p>
+            </div>
+            <button class="btn btn-decrypt" id="btn-toggle-decrypt">
+              <span class="lock-icon">🔒</span> Decrypt PHI
+            </button>
+          </div>
+
+          <!-- Raw Ciphertext View -->
+          <div id="rx-raw-cipher" class="cipher-box">
+            <div class="cipher-label">POSTGRESQL ENCRYPTED CIPHERTEXT (DIAGNOSIS & MEDICATIONS)</div>
+            <div class="cipher-content font-mono">enc:v1:aes-256-gcm:dGVzdF9pdjEyMzQ1:83hf93nd72hdbb0274bb8194ad98347101...:aad_consultation_id_c7810b42</div>
+            <div class="cipher-hint">Bound to row ID via Additional Authenticated Data (AAD) to prevent swap attacks.</div>
+          </div>
+
+          <!-- Decrypted Prescription View -->
+          <div id="rx-decrypted-view" class="decrypted-box hidden">
+            <div class="rx-diagnosis">
+              <span class="rx-tag">CLINICAL DIAGNOSIS</span>
+              <h4>Vata-Pitta Agnimandya (Metabolic Imbalance)</h4>
+            </div>
+            
+            <div class="rx-medications-table">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Ayurvedic Formulation</th>
+                    <th>Dosage</th>
+                    <th>Frequency</th>
+                    <th>Duration</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Triphala Churna (Organic)</strong></td>
+                    <td>1 teaspoon with warm water</td>
+                    <td>Night before bed</td>
+                    <td>21 Days</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Ashwagandharishta</strong></td>
+                    <td>20 ml with equal water</td>
+                    <td>Twice daily after meals</td>
+                    <td>30 Days</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Maha Yograj Guggulu</strong></td>
+                    <td>2 tablets</td>
+                    <td>Morning after breakfast</td>
+                    <td>14 Days</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="rx-instructions">
+              <strong>Lifestyle (Pathya-Apathya):</strong> Avoid cold, processed foods and refrigerated beverages. Practice 15 minutes of Anulom Vilom pranayama daily.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: SECURITY & AUDIT TRAIL -->
+    <div id="tab-security" class="tab-pane">
+      <div class="section-header">
+        <div>
+          <h2>Zero-Knowledge Security & Tamper-Evident Audit Chain</h2>
+          <p class="section-sub">Cryptographic verification of immutable audit logs & data classification</p>
+        </div>
+        <div class="action-buttons">
+          <button class="btn btn-primary" id="btn-verify-audit">✓ Verify SHA-256 Chain</button>
+          <button class="btn btn-danger" id="btn-simulate-tamper">⚠ Simulate Tampering Test</button>
+        </div>
+      </div>
+
+      <div class="security-grid">
+        <!-- Audit Hash Chain Card -->
+        <div class="card audit-chain-card">
+          <div class="chain-status-header">
+            <h3>Linear Cryptographic Chain</h3>
+            <span class="badge badge-success" id="chain-status-badge">CHAIN VERIFIED: OK (100% INTEGRITY)</span>
+          </div>
+          <p class="text-muted" style="margin-bottom: 16px;">
+            Every audit event contains the SHA-256 hash of its predecessor (<code class="font-mono">prev_hash</code>). Database triggers prohibit <code class="font-mono">UPDATE</code> or <code class="font-mono">DELETE</code>.
+          </p>
+
+          <div class="audit-blocks-container" id="audit-chain-stream">
+            <!-- Dynamic stream of audit blocks -->
+          </div>
+        </div>
+
+        <!-- Security Architecture Metrics -->
+        <div class="security-sidebar">
+          <div class="card control-card">
+            <h4>Security Controls Status</h4>
+            <ul class="control-list">
+              <li>
+                <span class="check-icon">✓</span>
+                <div>
+                  <strong>MFA (TOTP RFC 6238)</strong>
+                  <p>Mandatory for Doctor & Admin roles</p>
+                </div>
+              </li>
+              <li>
+                <span class="check-icon">✓</span>
+                <div>
+                  <strong>Field-level AES-256-GCM</strong>
+                  <p>Encrypted with per-row AAD context</p>
+                </div>
+              </li>
+              <li>
+                <span class="check-icon">✓</span>
+                <div>
+                  <strong>Session Family Revocation</strong>
+                  <p>SHA-256 hashed refresh tokens with replay theft cutoff</p>
+                </div>
+              </li>
+              <li>
+                <span class="check-icon">✓</span>
+                <div>
+                  <strong>Idempotency Enforcement</strong>
+                  <p>Safe write replays, 409 lock detection</p>
+                </div>
+              </li>
+              <li>
+                <span class="check-icon">✓</span>
+                <div>
+                  <strong>Partition Isolation</strong>
+                  <p>Range partitioned audit logs by month</p>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <div class="card key-rotation-card">
+            <h4>Active Encryption Keyring</h4>
+            <div class="keyring-item">
+              <span class="key-id">Key #1 (Active)</span>
+              <span class="key-type">AES-256-GCM 32-Byte</span>
+            </div>
+            <div class="keyring-item">
+              <span class="key-id">Key #2 (Standby)</span>
+              <span class="key-type">KMS Multi-Region Primary</span>
+            </div>
+            <button class="btn btn-secondary btn-block" style="margin-top: 12px;" onclick="alert('Key rotation script: npm run rotate-keys. Multi-version keys re-encrypt in background.')">
+              🔄 Trigger Online Key Rotation
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: ADMIN ANALYTICS -->
+    <div id="tab-analytics" class="tab-pane">
+      <div class="section-header">
+        <div>
+          <h2>System Analytics & Scale Overview</h2>
+          <p class="section-sub">Telemetry and business metrics engineered for 100k daily consultations</p>
+        </div>
+        <div class="action-buttons">
+          <span class="badge badge-info">LIVE TELEMETRY</span>
+        </div>
+      </div>
+
+      <!-- KPI Summary Cards -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <span class="kpi-title">Daily Consultations Capacity</span>
+          <div class="kpi-val">100,000</div>
+          <span class="kpi-trend positive">↑ 10x Headroom (r6g.2xlarge)</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-title">Gross Revenue (Month)</span>
+          <div class="kpi-val">₹42,85,000</div>
+          <span class="kpi-trend positive">Net: ₹41,12,500 after refunds</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-title">Read Latency (p95)</span>
+          <div class="kpi-val">138 ms</div>
+          <span class="kpi-trend positive">Target: &lt; 200 ms</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-title">Write Latency (p95)</span>
+          <div class="kpi-val">345 ms</div>
+          <span class="kpi-trend positive">Target: &lt; 500 ms</span>
+        </div>
+      </div>
+
+      <!-- Analytics Breakdown -->
+      <div class="analytics-layout">
+        <div class="card">
+          <h3 class="card-title">Consultation Status Breakdown</h3>
+          <div class="status-distribution">
+            <div class="dist-row">
+              <span>CONFIRMED / COMPLETED</span>
+              <span class="dist-bar"><div class="fill" style="width: 84%;"></div></span>
+              <span class="dist-count">84,200</span>
+            </div>
+            <div class="dist-row">
+              <span>PENDING_PAYMENT</span>
+              <span class="dist-bar"><div class="fill" style="width: 8%;"></div></span>
+              <span class="dist-count">8,100</span>
+            </div>
+            <div class="dist-row">
+              <span>CANCELLED / REFUNDED</span>
+              <span class="dist-bar"><div class="fill" style="width: 5%;"></div></span>
+              <span class="dist-count">5,200</span>
+            </div>
+            <div class="dist-row">
+              <span>EXPIRED HOLDS</span>
+              <span class="dist-bar"><div class="fill" style="width: 3%;"></div></span>
+              <span class="dist-count">2,500</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">Doctor Verification Queue</h3>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Doctor</th>
+                <th>Specialization</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="doctor-verify-table">
+              <tr>
+                <td><strong>Dr. Asha Verma</strong></td>
+                <td>Ayurveda</td>
+                <td><span class="badge badge-success">VERIFIED</span></td>
+                <td><button class="btn btn-sm btn-secondary" onclick="alert('Doctor is verified and active in search catalog.')">Audited</button></td>
+              </tr>
+              <tr>
+                <td><strong>Dr. Rohan Mehta</strong></td>
+                <td>Dermatology</td>
+                <td><span class="badge badge-success">VERIFIED</span></td>
+                <td><button class="btn btn-sm btn-secondary" onclick="alert('Doctor is verified and active in search catalog.')">Audited</button></td>
+              </tr>
+              <tr>
+                <td><strong>Dr. Vikram Patil</strong></td>
+                <td>Panchakarma</td>
+                <td><span class="badge badge-warning">PENDING REVIEW</span></td>
+                <td><button class="btn btn-sm btn-primary" onclick="this.parentElement.previousElementSibling.innerHTML='<span class=\'badge badge-success\'>VERIFIED</span>'; this.textContent='Audited'; this.className='btn btn-sm btn-secondary';">Verify</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 5: API PLAYGROUND -->
+    <div id="tab-api" class="tab-pane">
+      <div class="section-header">
+        <div>
+          <h2>Interactive API Playground</h2>
+          <p class="section-sub">Directly query production endpoints with real-time response inspection</p>
+        </div>
+        <div class="action-buttons">
+          <a href="/docs" target="_blank" class="btn btn-primary">Open Full Swagger UI ↗</a>
+        </div>
+      </div>
+
+      <div class="api-playground-layout">
+        <div class="api-controls-panel card">
+          <h4>Select Endpoint</h4>
+          <div class="endpoint-btns">
+            <button class="ep-btn active" data-ep="/healthz" data-method="GET">GET /healthz</button>
+            <button class="ep-btn" data-ep="/readyz" data-method="GET">GET /readyz</button>
+            <button class="ep-btn" data-ep="/metrics" data-method="GET">GET /metrics</button>
+            <button class="ep-btn" data-ep="/api/v1/doctors" data-method="GET">GET /api/v1/doctors</button>
+          </div>
+
+          <div style="margin-top: 16px;">
+            <button class="btn btn-primary btn-block" id="btn-send-api-req">Send HTTP Request</button>
+          </div>
+        </div>
+
+        <div class="api-response-panel card">
+          <div class="response-header">
+            <h4>HTTP Response</h4>
+            <div id="api-status-badge" class="badge badge-success">HTTP 200 OK</div>
+          </div>
+          <div class="response-meta font-mono" id="api-response-meta">
+            Latency: 4ms • X-Request-Id: 2532d5f4-6473-4fa2-9730-b04c001b2e50
+          </div>
+          <pre class="response-body font-mono" id="api-response-body">Click "Send HTTP Request" to execute query...</pre>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Interactive Booking Modal -->
+  <div class="modal-overlay hidden" id="booking-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modal-doctor-name">Book Appointment</h3>
+        <button class="close-btn" id="btn-close-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-doc-summary" id="modal-doc-summary"></div>
+        
+        <div class="form-group" style="margin-top: 16px;">
+          <label>Select Time Slot</label>
+          <div class="slot-selection-grid" id="modal-slot-grid">
+            <!-- Slot buttons -->
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 16px;">
+          <label>Consultation Reason (Encrypted with AES-256-GCM)</label>
+          <textarea id="modal-reason" class="form-control" rows="3" placeholder="Describe your symptoms or consultation requirement..."></textarea>
+        </div>
+
+        <div class="idempotency-preview">
+          <span class="preview-label">Idempotency-Key Header:</span>
+          <span class="preview-val font-mono" id="modal-idem-key">idem-88371-382a</span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="btn-cancel-booking">Cancel</button>
+        <button class="btn btn-primary" id="btn-confirm-booking">Confirm & Hold Slot (Saga)</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="main-footer">
+    <div class="footer-container">
+      <p>Amrutam Telemedicine Backend • OpenTelemetry Traces • Prometheus Metrics • PostgreSQL Multi-AZ</p>
+      <div class="footer-links">
+        <a href="/docs" target="_blank">Swagger Documentation</a>
+        <a href="https://github.com/Lithish779/Amrutham" target="_blank">GitHub Repository</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/app.js"></script>
+</body>
+</html>

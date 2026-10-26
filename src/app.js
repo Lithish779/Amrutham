@@ -42,7 +42,11 @@ function createApp(c) {
     app.use('/docs', swaggerUi.serve, swaggerUi.setup(spec));
   }
 
-  app.use(helmet({ hsts: { maxAge: 31536000, includeSubDomains: true }, referrerPolicy: { policy: 'no-referrer' } }));
+  app.use(helmet({
+    hsts: { maxAge: 31536000, includeSubDomains: true },
+    referrerPolicy: { policy: 'no-referrer' },
+    contentSecurityPolicy: false,
+  }));
   app.use(cors({ origin: config.corsOrigins.length ? config.corsOrigins : false, credentials: false, maxAge: 600 }));
   app.use(pinoHttp({
     logger, genReqId: (req) => req.id,
@@ -64,6 +68,9 @@ function createApp(c) {
   v1.use('/admin', adminRoutes(c));
   v1.use('/webhooks', webhookRoutes(c));
   app.use('/api/v1', v1);
+
+  // Serve modern interactive telemedicine web portal
+  app.use(express.static(path.join(__dirname, '../public')));
 
   app.use((req, res, next) => next(E.notFound('Route not found')));
   app.use(errorHandler({ logger, config }));
