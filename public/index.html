@@ -3,125 +3,190 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Amrutam Telemedicine | Ancient Wisdom, Modern Healthcare</title>
+  <title>Amrutam Telemedicine Platform | Ayurvedic Healthcare & API Portal</title>
+  <meta name="description" content="Amrutam Telemedicine Platform - Find verified Ayurvedic specialists, book race-free consultations, view encrypted prescriptions, verify audit logs, and explore interactive API docs.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-  <!-- Ambient background glow elements -->
-  <div class="ambient-glow glow-1"></div>
-  <div class="ambient-glow glow-2"></div>
-  <div class="ambient-glow glow-3"></div>
 
-  <!-- Main Top Navigation -->
-  <header class="top-header">
-    <div class="nav-container">
-      <div class="brand">
+  <!-- Top Navigation Bar matching the Screenshot layout & color palette -->
+  <header class="top-nav">
+    <div class="nav-left">
+      <div class="brand-container" id="brand-home-trigger">
         <div class="brand-logo">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" fill="rgba(16,185,129,0.15)"/>
-            <path d="M12 6v12M6 12h12" stroke="#10b981" stroke-linecap="round"/>
-            <circle cx="12" cy="12" r="3" fill="#34d399"/>
+          <!-- Heart + Cross medical shield icon matching screenshot -->
+          <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+            <path d="M16 29C16 29 4 21 4 11C4 6.58 7.58 3 12 3C14.6 3 16.9 4.24 18.3 6.16C19.7 4.24 22 3 24.6 3C29.02 3 32.6 6.58 32.6 11C32.6 21 20.6 29 16 29Z" fill="#fee2e2" stroke="#ef4444" stroke-width="2"/>
+            <rect x="13.5" y="8.5" width="5" height="13" rx="1.5" fill="#2563eb"/>
+            <rect x="9.5" y="12.5" width="13" height="5" rx="1.5" fill="#2563eb"/>
+            <circle cx="16" cy="15" r="1.5" fill="#ffffff"/>
           </svg>
         </div>
-        <div class="brand-text">
-          <span class="brand-title">AMRUTAM</span>
-          <span class="brand-subtitle">TELEMEDICINE PLATFORM</span>
+        <div class="brand-details">
+          <div class="brand-name">Amrutam</div>
+          <div class="brand-sub">Telemedicine Platform</div>
         </div>
       </div>
+    </div>
 
-      <nav class="nav-links">
-        <button class="nav-btn active" data-tab="doctors">
-          <span class="nav-icon">👨‍⚕️</span> Find Doctors
-        </button>
-        <button class="nav-btn" data-tab="consultations">
-          <span class="nav-icon">📋</span> Consultations & Rx
-        </button>
-        <button class="nav-btn" data-tab="security">
-          <span class="nav-icon">🛡️</span> Security & Audit
-        </button>
-        <button class="nav-btn" data-tab="analytics">
-          <span class="nav-icon">📊</span> Admin Analytics
-        </button>
-        <button class="nav-btn" data-tab="api">
-          <span class="nav-icon">⚡</span> API Playground
-        </button>
-      </nav>
+    <!-- Navigation Tabs matching the original system features -->
+    <nav class="nav-tabs-bar">
+      <button class="nav-tab-btn active" data-tab="doctors">
+        <span class="tab-icon">👨‍⚕️</span> Find Doctors
+      </button>
+      <button class="nav-tab-btn" data-tab="consultations">
+        <span class="tab-icon">📋</span> Consultations & Rx
+      </button>
+      <button class="nav-tab-btn" data-tab="security">
+        <span class="tab-icon">🛡️</span> Security & Audit
+      </button>
+      <button class="nav-tab-btn" data-tab="analytics">
+        <span class="tab-icon">📊</span> Admin Analytics
+      </button>
+      <button class="nav-tab-btn" data-tab="api">
+        <span class="tab-icon">⚡</span> API Documentation
+      </button>
+    </nav>
 
-      <div class="header-actions">
-        <div class="live-status-pill" id="system-health-pill">
-          <span class="pulse-dot"></span>
-          <span class="status-text">99.95% Uptime • p95 142ms</span>
-        </div>
-        <a href="/docs" target="_blank" class="docs-btn">
-          <span>Swagger Docs</span>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
-        </a>
+    <!-- Right Controls -->
+    <div class="nav-right">
+      <div class="search-input-box" id="nav-search-trigger">
+        <svg class="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" id="global-search-input" placeholder="Search..." autocomplete="off">
+        <span class="search-kbd-badge">⌘ K</span>
       </div>
+
+      <div class="version-select-box">
+        <span>v1.0.0</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </div>
+
+      <div class="status-indicator-pill" id="api-status-indicator">
+        <span class="status-pulse-dot"></span>
+        <span class="status-label">API Online</span>
+      </div>
+
+      <a href="/docs" target="_blank" class="btn-goto-app">
+        <span>Swagger Docs</span>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+          <polyline points="15 3 21 3 21 9"></polyline>
+          <line x1="10" y1="14" x2="21" y2="3"></line>
+        </svg>
+      </a>
     </div>
   </header>
 
-  <!-- Hero Section -->
-  <section class="hero-section">
-    <div class="hero-content">
-      <div class="hero-tag">
-        <span class="hero-badge">ENTERPRISE TELEMEDICINE BACKEND</span>
-        <span class="hero-meta">100k Daily Consultations • AES-256-GCM PHI • Multi-AZ Saga</span>
+  <!-- Hero Banner matching the screenshot color palette & 3D illustration -->
+  <section class="hero-banner-card">
+    <div class="hero-text-side">
+      <h1 class="hero-title">Amrutam <span class="hero-title-highlight">Telemedicine Portal</span></h1>
+      <p class="hero-subtitle">Ancient Ayurvedic wisdom meets modern fault-tolerant engineering. Zero double-booking, encrypted prescriptions, and tamper-evident audit trails.</p>
+
+      <!-- 4 Feature Badges Grid -->
+      <div class="feature-pills-grid">
+        <div class="feature-pill">
+          <div class="feature-pill-icon">🛡️</div>
+          <div class="feature-pill-text">
+            <div class="pill-title">Secure & Compliant</div>
+            <div class="pill-desc">HIPAA inspired AES-256-GCM</div>
+          </div>
+        </div>
+
+        <div class="feature-pill">
+          <div class="feature-pill-icon">📊</div>
+          <div class="feature-pill-text">
+            <div class="pill-title">Scalable Architecture</div>
+            <div class="pill-desc">100k+ daily consultations</div>
+          </div>
+        </div>
+
+        <div class="feature-pill">
+          <div class="feature-pill-icon">⚡</div>
+          <div class="feature-pill-text">
+            <div class="pill-title">Race-Free Booking</div>
+            <div class="pill-desc">CAS slots & distributed saga</div>
+          </div>
+        </div>
+
+        <div class="feature-pill">
+          <div class="feature-pill-icon">💻</div>
+          <div class="feature-pill-text">
+            <div class="pill-title">Developer Friendly</div>
+            <div class="pill-desc">OpenAPI 3.0 & interactive sandbox</div>
+          </div>
+        </div>
       </div>
-      <h1 class="hero-headline">Ayurvedic Healthcare Meets <span class="gradient-text">Fault-Tolerant Engineering</span></h1>
-      <p class="hero-description">
-        Experience zero-double-booking consultations, end-to-end encrypted medical records, tamper-evident SHA-256 audit trails, and sub-200ms catalog search powered by PostgreSQL and Node.js.
-      </p>
+    </div>
+
+    <!-- 3D Medical Tech Illustration from screenshot -->
+    <div class="hero-image-side">
+      <img src="/hero-illustration.jpg" alt="Amrutam Telemedicine Portal" class="hero-illustration-img">
     </div>
   </section>
 
   <!-- Main Content Tabs Container -->
-  <main class="main-container">
+  <main class="main-content-wrapper">
 
-    <!-- TAB 1: DOCTORS SEARCH & BOOKING -->
-    <div id="tab-doctors" class="tab-pane active">
-      <div class="section-header">
+    <!-- ====================================================================
+         TAB 1: FIND DOCTORS & BOOK APPOINTMENTS (ACTIVE AT START)
+         ==================================================================== -->
+    <section id="tab-doctors" class="tab-pane active">
+      <div class="section-header-bar">
         <div>
-          <h2>Available Specialists</h2>
-          <p class="section-sub">Verified Ayurvedic practitioners with real-time slot scheduling</p>
+          <h2 class="pane-heading">Available Specialists & Online Appointments</h2>
+          <p class="pane-sub">Browse certified Ayurvedic doctors, check verified qualifications, and book appointments with real-time CAS slot locking.</p>
         </div>
-        <div class="filters-bar">
-          <div class="search-box">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        
+        <!-- Search & Filter Controls -->
+        <div class="filters-cluster">
+          <div class="doctor-search-box">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
             <input type="text" id="doctor-search-input" placeholder="Search doctor name or specialization...">
           </div>
+
           <div class="filter-pills" id="specialization-filters">
-            <button class="pill active" data-spec="all">All</button>
-            <button class="pill" data-spec="Ayurveda">Ayurveda</button>
-            <button class="pill" data-spec="Dermatology">Dermatology</button>
-            <button class="pill" data-spec="Panchakarma">Panchakarma</button>
-            <button class="pill" data-spec="Kayachikitsa">Kayachikitsa</button>
+            <button class="pill-btn active" data-spec="all">All Specialties</button>
+            <button class="pill-btn" data-spec="Ayurveda">Ayurveda</button>
+            <button class="pill-btn" data-spec="Dermatology">Dermatology</button>
+            <button class="pill-btn" data-spec="Panchakarma">Panchakarma</button>
+            <button class="pill-btn" data-spec="Kayachikitsa">Kayachikitsa</button>
           </div>
         </div>
       </div>
 
-      <div class="doctors-grid" id="doctors-list">
-        <!-- Rendered dynamically by JavaScript -->
+      <!-- Doctors Grid rendered by app.js -->
+      <div class="doctors-cards-grid" id="doctors-list">
+        <!-- Rendered dynamically -->
       </div>
-    </div>
+    </section>
 
-    <!-- TAB 2: CONSULTATIONS & PRESCRIPTIONS -->
-    <div id="tab-consultations" class="tab-pane">
-      <div class="section-header">
+    <!-- ====================================================================
+         TAB 2: CONSULTATIONS & PRESCRIPTIONS
+         ==================================================================== -->
+    <section id="tab-consultations" class="tab-pane">
+      <div class="section-header-bar">
         <div>
-          <h2>Active Consultation & Digital Prescription</h2>
-          <p class="section-sub">End-to-end lifecycle from HELD reservation to AES-256-GCM decrypted prescription</p>
+          <h2 class="pane-heading">Active Consultation & Encrypted Prescription</h2>
+          <p class="pane-sub">End-to-end lifecycle from HELD reservation to AES-256-GCM decrypted prescription.</p>
         </div>
-        <div class="action-buttons">
-          <button class="btn btn-secondary" id="btn-refresh-consultations">↻ Refresh Status</button>
-        </div>
+        <button class="btn btn-secondary" id="btn-refresh-consultations">↻ Refresh Status</button>
       </div>
 
-      <!-- Saga State Machine Visualization -->
-      <div class="card saga-card">
-        <h3 class="card-title">Orchestrated Saga State Flow</h3>
+      <!-- Saga Stepper Flow -->
+      <div class="card saga-flow-card">
+        <h3 class="card-subtitle">Orchestrated Saga State Flow</h3>
         <div class="saga-stepper">
           <div class="step completed">
             <div class="step-circle">✓</div>
@@ -155,46 +220,46 @@
         </div>
       </div>
 
-      <!-- Active Consultation Details -->
-      <div class="consultation-layout">
-        <div class="card consultation-detail-card">
-          <div class="consultation-header">
+      <div class="consultation-split-layout">
+        <!-- Consultation Details -->
+        <div class="card consult-details-card">
+          <div class="consult-card-top">
             <div>
               <span class="badge badge-success">CONFIRMED & SCHEDULED</span>
-              <h3 style="margin-top: 8px;">Consultation with Dr. Asha Verma</h3>
-              <p class="text-muted">Chief Ayurvedic Physician • BAMS, MD (Ayurveda)</p>
+              <h3 style="margin-top: 8px; font-size: 18px; font-weight: 700;">Consultation with Dr. Asha Verma</h3>
+              <p class="text-muted" style="font-size: 13px;">Chief Ayurvedic Physician • BAMS, MD (Ayurveda)</p>
             </div>
-            <div class="booking-price">
+            <div class="booking-price-pill">
               <span class="price-val">₹750</span>
               <span class="price-label">PAID (INR)</span>
             </div>
           </div>
 
           <div class="consult-meta-grid">
-            <div class="meta-item">
+            <div class="meta-box">
               <span class="meta-title">Time Window</span>
               <span class="meta-value">Today, 03:30 PM - 04:00 PM (IST)</span>
             </div>
-            <div class="meta-item">
+            <div class="meta-box">
               <span class="meta-title">Idempotency Key</span>
               <span class="meta-value font-mono">idem-99214-482f8a</span>
             </div>
-            <div class="meta-item">
+            <div class="meta-box">
               <span class="meta-title">Consultation ID</span>
               <span class="meta-value font-mono">c7810b42-19e4-4a52-b883</span>
             </div>
-            <div class="meta-item">
+            <div class="meta-box">
               <span class="meta-title">Payment Provider Ref</span>
               <span class="meta-value font-mono">pi_mock_9934182937</span>
             </div>
           </div>
 
-          <div class="consult-reason-box">
+          <div class="phi-reason-box">
             <div class="phi-badge">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
               RESTRICTED PHI (AES-256-GCM AT REST)
             </div>
-            <p style="margin-top: 6px; font-size: 0.95rem;"><strong>Patient Symptoms:</strong> Chronic digestive sluggishness, joint stiffness during winter, and disturbed sleep patterns.</p>
+            <p style="margin-top: 6px; font-size: 13.5px; color: #1e293b;"><strong>Patient Symptoms:</strong> Chronic digestive sluggishness, joint stiffness during winter, and disturbed sleep patterns.</p>
           </div>
         </div>
 
@@ -202,10 +267,10 @@
         <div class="card prescription-card">
           <div class="prescription-header">
             <div>
-              <h3 class="card-title">Digital Prescription #RX-8820</h3>
-              <p class="text-muted">Issued by Dr. Asha Verma • Council Reg: AYUR-84729</p>
+              <h3 class="card-subtitle">Digital Prescription #RX-8820</h3>
+              <p class="text-muted" style="font-size: 12.5px;">Issued by Dr. Asha Verma • Council Reg: AYUR-84729</p>
             </div>
-            <button class="btn btn-decrypt" id="btn-toggle-decrypt">
+            <button class="btn btn-primary" id="btn-toggle-decrypt">
               <span class="lock-icon">🔒</span> Decrypt PHI
             </button>
           </div>
@@ -214,14 +279,14 @@
           <div id="rx-raw-cipher" class="cipher-box">
             <div class="cipher-label">POSTGRESQL ENCRYPTED CIPHERTEXT (DIAGNOSIS & MEDICATIONS)</div>
             <div class="cipher-content font-mono">enc:v1:aes-256-gcm:dGVzdF9pdjEyMzQ1:83hf93nd72hdbb0274bb8194ad98347101...:aad_consultation_id_c7810b42</div>
-            <div class="cipher-hint">Bound to row ID via Additional Authenticated Data (AAD) to prevent swap attacks.</div>
+            <div class="cipher-hint">Bound to consultation ID via Additional Authenticated Data (AAD) to prevent swap attacks.</div>
           </div>
 
           <!-- Decrypted Prescription View -->
           <div id="rx-decrypted-view" class="decrypted-box hidden">
             <div class="rx-diagnosis">
               <span class="rx-tag">CLINICAL DIAGNOSIS</span>
-              <h4>Vata-Pitta Agnimandya (Metabolic Imbalance)</h4>
+              <h4 style="color: #0f172a; margin-top: 4px; font-size: 15px;">Vata-Pitta Agnimandya (Metabolic Imbalance)</h4>
             </div>
             
             <div class="rx-medications-table">
@@ -263,29 +328,31 @@
           </div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <!-- TAB 3: SECURITY & AUDIT TRAIL -->
-    <div id="tab-security" class="tab-pane">
-      <div class="section-header">
+    <!-- ====================================================================
+         TAB 3: SECURITY & AUDIT TRAIL
+         ==================================================================== -->
+    <section id="tab-security" class="tab-pane">
+      <div class="section-header-bar">
         <div>
-          <h2>Zero-Knowledge Security & Tamper-Evident Audit Chain</h2>
-          <p class="section-sub">Cryptographic verification of immutable audit logs & data classification</p>
+          <h2 class="pane-heading">Zero-Knowledge Security & Tamper-Evident Audit Chain</h2>
+          <p class="pane-sub">Cryptographic verification of immutable audit logs & data classification.</p>
         </div>
-        <div class="action-buttons">
+        <div class="action-buttons-row">
           <button class="btn btn-primary" id="btn-verify-audit">✓ Verify SHA-256 Chain</button>
           <button class="btn btn-danger" id="btn-simulate-tamper">⚠ Simulate Tampering Test</button>
         </div>
       </div>
 
-      <div class="security-grid">
+      <div class="security-split-layout">
         <!-- Audit Hash Chain Card -->
         <div class="card audit-chain-card">
           <div class="chain-status-header">
-            <h3>Linear Cryptographic Chain</h3>
+            <h3 class="card-subtitle">Linear Cryptographic Chain</h3>
             <span class="badge badge-success" id="chain-status-badge">CHAIN VERIFIED: OK (100% INTEGRITY)</span>
           </div>
-          <p class="text-muted" style="margin-bottom: 16px;">
+          <p class="text-muted" style="margin-bottom: 16px; font-size: 13px;">
             Every audit event contains the SHA-256 hash of its predecessor (<code class="font-mono">prev_hash</code>). Database triggers prohibit <code class="font-mono">UPDATE</code> or <code class="font-mono">DELETE</code>.
           </p>
 
@@ -294,77 +361,41 @@
           </div>
         </div>
 
-        <!-- Security Architecture Metrics -->
-        <div class="security-sidebar">
+        <!-- Security Controls Status -->
+        <div class="security-controls-panel">
           <div class="card control-card">
-            <h4>Security Controls Status</h4>
-            <ul class="control-list">
-              <li>
-                <span class="check-icon">✓</span>
-                <div>
-                  <strong>MFA (TOTP RFC 6238)</strong>
-                  <p>Mandatory for Doctor & Admin roles</p>
-                </div>
-              </li>
-              <li>
-                <span class="check-icon">✓</span>
-                <div>
-                  <strong>Field-level AES-256-GCM</strong>
-                  <p>Encrypted with per-row AAD context</p>
-                </div>
-              </li>
-              <li>
-                <span class="check-icon">✓</span>
-                <div>
-                  <strong>Session Family Revocation</strong>
-                  <p>SHA-256 hashed refresh tokens with replay theft cutoff</p>
-                </div>
-              </li>
-              <li>
-                <span class="check-icon">✓</span>
-                <div>
-                  <strong>Idempotency Enforcement</strong>
-                  <p>Safe write replays, 409 lock detection</p>
-                </div>
-              </li>
-              <li>
-                <span class="check-icon">✓</span>
-                <div>
-                  <strong>Partition Isolation</strong>
-                  <p>Range partitioned audit logs by month</p>
-                </div>
-              </li>
-            </ul>
-          </div>
-
-          <div class="card key-rotation-card">
-            <h4>Active Encryption Keyring</h4>
-            <div class="keyring-item">
-              <span class="key-id">Key #1 (Active)</span>
-              <span class="key-type">AES-256-GCM 32-Byte</span>
+            <h4 class="card-subtitle">Security Controls Status</h4>
+            <div class="control-item">
+              <span class="control-name">AES-256-GCM PHI At-Rest</span>
+              <span class="badge badge-success">ACTIVE (KEY #1)</span>
             </div>
-            <div class="keyring-item">
-              <span class="key-id">Key #2 (Standby)</span>
-              <span class="key-type">KMS Multi-Region Primary</span>
+            <div class="control-item">
+              <span class="control-name">Row AAD Integrity Binding</span>
+              <span class="badge badge-success">ENFORCED</span>
             </div>
-            <button class="btn btn-secondary btn-block" style="margin-top: 12px;" onclick="alert('Key rotation script: npm run rotate-keys. Multi-version keys re-encrypt in background.')">
-              🔄 Trigger Online Key Rotation
-            </button>
+            <div class="control-item">
+              <span class="control-name">Key Rotation Pipeline</span>
+              <span class="badge badge-info">AUTOMATED</span>
+            </div>
+            <div class="control-item">
+              <span class="control-name">Immutable Audit Partitioning</span>
+              <span class="badge badge-success">MONTHLY PG TABS</span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <!-- TAB 4: ADMIN ANALYTICS -->
-    <div id="tab-analytics" class="tab-pane">
-      <div class="section-header">
+    <!-- ====================================================================
+         TAB 4: ADMIN ANALYTICS
+         ==================================================================== -->
+    <section id="tab-analytics" class="tab-pane">
+      <div class="section-header-bar">
         <div>
-          <h2>System Analytics & Scale Overview</h2>
-          <p class="section-sub">Telemetry and business metrics engineered for 100k daily consultations</p>
+          <h2 class="pane-heading">System Analytics & Scale Overview</h2>
+          <p class="pane-sub">Telemetry and business metrics engineered for 100k daily consultations.</p>
         </div>
-        <div class="action-buttons">
-          <span class="badge badge-info">LIVE TELEMETRY</span>
-        </div>
+        <span class="badge badge-info">LIVE TELEMETRY</span>
       </div>
 
       <!-- KPI Summary Cards -->
@@ -392,35 +423,35 @@
       </div>
 
       <!-- Analytics Breakdown -->
-      <div class="analytics-layout">
+      <div class="analytics-split-layout">
         <div class="card">
-          <h3 class="card-title">Consultation Status Breakdown</h3>
+          <h3 class="card-subtitle">Consultation Status Breakdown</h3>
           <div class="status-distribution">
             <div class="dist-row">
-              <span>CONFIRMED / COMPLETED</span>
+              <span class="dist-name">CONFIRMED / COMPLETED</span>
               <span class="dist-bar"><div class="fill" style="width: 84%;"></div></span>
-              <span class="dist-count">84,200</span>
+              <span class="dist-count font-mono">84,200</span>
             </div>
             <div class="dist-row">
-              <span>PENDING_PAYMENT</span>
+              <span class="dist-name">PENDING_PAYMENT</span>
               <span class="dist-bar"><div class="fill" style="width: 8%;"></div></span>
-              <span class="dist-count">8,100</span>
+              <span class="dist-count font-mono">8,100</span>
             </div>
             <div class="dist-row">
-              <span>CANCELLED / REFUNDED</span>
+              <span class="dist-name">CANCELLED / REFUNDED</span>
               <span class="dist-bar"><div class="fill" style="width: 5%;"></div></span>
-              <span class="dist-count">5,200</span>
+              <span class="dist-count font-mono">5,200</span>
             </div>
             <div class="dist-row">
-              <span>EXPIRED HOLDS</span>
+              <span class="dist-name">EXPIRED HOLDS</span>
               <span class="dist-bar"><div class="fill" style="width: 3%;"></div></span>
-              <span class="dist-count">2,500</span>
+              <span class="dist-count font-mono">2,500</span>
             </div>
           </div>
         </div>
 
         <div class="card">
-          <h3 class="card-title">Doctor Verification Queue</h3>
+          <h3 class="card-subtitle">Doctor Verification Queue</h3>
           <table class="table">
             <thead>
               <tr>
@@ -453,69 +484,202 @@
           </table>
         </div>
       </div>
-    </div>
+    </section>
 
-    <!-- TAB 5: API PLAYGROUND -->
-    <div id="tab-api" class="tab-pane">
-      <div class="section-header">
-        <div>
-          <h2>Interactive API Playground</h2>
-          <p class="section-sub">Directly query production endpoints with real-time response inspection</p>
-        </div>
-        <div class="action-buttons">
-          <a href="/docs" target="_blank" class="btn btn-primary">Open Full Swagger UI ↗</a>
+    <!-- ====================================================================
+         TAB 5: API DOCUMENTATION & INTERACTIVE PLAYGROUND (SCREENSHOT LAYOUT)
+         ==================================================================== -->
+    <section id="tab-api" class="tab-pane">
+      <div class="api-portal-container">
+        
+        <!-- Left Sub-Sidebar for API Endpoints -->
+        <aside class="api-sub-sidebar">
+          <div class="sub-nav-section-title">AUTHENTICATION</div>
+          <button class="api-nav-link active" data-endpoint-id="post-api-auth-register">
+            <span class="method-tag post">POST</span>
+            <span>Register User</span>
+          </button>
+          <button class="api-nav-link" data-endpoint-id="post-api-auth-login">
+            <span class="method-tag post">POST</span>
+            <span>Login</span>
+          </button>
+          <button class="api-nav-link" data-endpoint-id="post-api-auth-refresh">
+            <span class="method-tag post">POST</span>
+            <span>Refresh Token</span>
+          </button>
+
+          <div class="sub-nav-section-title">USERS</div>
+          <button class="api-nav-link" data-endpoint-id="get-api-users-me">
+            <span class="method-tag get">GET</span>
+            <span>User Profile</span>
+          </button>
+          <button class="api-nav-link" data-endpoint-id="put-api-users-me">
+            <span class="method-tag put">PUT</span>
+            <span>Update Profile</span>
+          </button>
+
+          <div class="sub-nav-section-title">DOCTORS</div>
+          <button class="api-nav-link" data-endpoint-id="get-api-doctors">
+            <span class="method-tag get">GET</span>
+            <span>List Doctors</span>
+          </button>
+          <button class="api-nav-link" data-endpoint-id="get-api-doctors-availability">
+            <span class="method-tag get">GET</span>
+            <span>Availability Slots</span>
+          </button>
+
+          <div class="sub-nav-section-title">BOOKINGS</div>
+          <button class="api-nav-link" data-endpoint-id="post-api-bookings">
+            <span class="method-tag post">POST</span>
+            <span>Create Booking</span>
+          </button>
+          <button class="api-nav-link" data-endpoint-id="get-api-bookings-id">
+            <span class="method-tag get">GET</span>
+            <span>Get Booking</span>
+          </button>
+          <button class="api-nav-link" data-endpoint-id="post-api-bookings-cancel">
+            <span class="method-tag post">POST</span>
+            <span>Cancel Booking</span>
+          </button>
+        </aside>
+
+        <!-- Right Side: API Inspector matching the screenshot -->
+        <div class="api-sub-inspector">
+          <div class="inspector-header">
+            <div class="inspector-title-row">
+              <span class="method-tag post" id="insp-method-tag">POST</span>
+              <span class="insp-path font-mono" id="insp-path">/api/auth/register</span>
+              <button class="btn-try-it-out" id="btn-try-it-out">Try it out</button>
+            </div>
+            <p class="insp-sub" id="insp-sub">Register a new user account</p>
+          </div>
+
+          <!-- Navigation Tabs -->
+          <div class="inspector-tabs">
+            <button class="insp-tab active" data-tab="overview">Overview</button>
+            <button class="insp-tab" data-tab="request">Request</button>
+            <button class="insp-tab" data-tab="response">Response</button>
+            <button class="insp-tab" data-tab="auth">Authentication</button>
+            <button class="insp-tab" data-tab="code">Code Example</button>
+          </div>
+
+          <!-- Tab Content Area -->
+          <div class="inspector-content">
+            <div class="callout-banner" id="insp-banner">
+              Register a new user (patient or doctor) in the system.
+            </div>
+
+            <!-- Request URL Section -->
+            <div class="inspector-section">
+              <div class="section-label-row">
+                <span class="section-label">Request URL</span>
+              </div>
+              <div class="url-code-pill font-mono">
+                <span id="insp-request-url">https://api.amrutam.com/api/auth/register</span>
+                <button class="copy-btn" id="btn-copy-url" title="Copy URL">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Request Body Section -->
+            <div class="inspector-section" id="req-body-section">
+              <div class="section-label-row">
+                <span class="section-label">Request Body</span>
+                <div class="section-label-right">
+                  <span class="content-type-badge font-mono">application/json</span>
+                  <button class="copy-btn" id="btn-copy-req-body" title="Copy Body">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <div class="code-block-container" id="code-req-wrapper">
+                <div class="code-line-numbers font-mono" id="req-line-numbers">
+                  1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9
+                </div>
+                <pre class="code-content font-mono" id="insp-request-body"><code>{
+  <span class="json-key">"name"</span>: <span class="json-str">"John Doe"</span>,
+  <span class="json-key">"email"</span>: <span class="json-str">"john@example.com"</span>,
+  <span class="json-key">"password"</span>: <span class="json-str">"SecurePassword123"</span>,
+  <span class="json-key">"role"</span>: <span class="json-str">"patient"</span>,
+  <span class="json-key">"phone"</span>: <span class="json-str">"+91 9876543210"</span>,
+  <span class="json-key">"dateOfBirth"</span>: <span class="json-str">"2000-01-01"</span>,
+  <span class="json-key">"gender"</span>: <span class="json-str">"male"</span>
+}</code></pre>
+              </div>
+            </div>
+
+            <!-- Responses Section -->
+            <div class="inspector-section">
+              <div class="section-label-row">
+                <span class="section-label">Responses</span>
+              </div>
+
+              <!-- Status Code Filter Pills -->
+              <div class="status-pills-row" id="response-status-pills">
+                <button class="status-pill active" data-status="201">201 Success</button>
+                <button class="status-pill" data-status="400">400 Bad Request</button>
+                <button class="status-pill" data-status="409">409 Conflict</button>
+                <button class="status-pill" data-status="500">500 Server Error</button>
+              </div>
+
+              <div class="status-desc-text" id="status-desc-text">
+                User registered successfully
+              </div>
+
+              <div class="code-block-container response" id="code-res-wrapper">
+                <div class="code-line-numbers font-mono" id="res-line-numbers">
+                  1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10
+                </div>
+                <pre class="code-content font-mono" id="insp-response-body"><code>{
+  <span class="json-key">"success"</span>: <span class="json-bool">true</span>,
+  <span class="json-key">"message"</span>: <span class="json-str">"User registered successfully"</span>,
+  <span class="json-key">"data"</span>: {
+    <span class="json-key">"id"</span>: <span class="json-str">"64f2c1e9b2a1d5e4f8c9a123"</span>,
+    <span class="json-key">"name"</span>: <span class="json-str">"John Doe"</span>,
+    <span class="json-key">"email"</span>: <span class="json-str">"john@example.com"</span>,
+    <span class="json-key">"role"</span>: <span class="json-str">"patient"</span>,
+    <span class="json-key">"token"</span>: <span class="json-str">"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."</span>
+  }
+}</code></pre>
+              </div>
+            </div>
+
+          </div>
         </div>
       </div>
-
-      <div class="api-playground-layout">
-        <div class="api-controls-panel card">
-          <h4>Select Endpoint</h4>
-          <div class="endpoint-btns">
-            <button class="ep-btn active" data-ep="/healthz" data-method="GET">GET /healthz</button>
-            <button class="ep-btn" data-ep="/readyz" data-method="GET">GET /readyz</button>
-            <button class="ep-btn" data-ep="/metrics" data-method="GET">GET /metrics</button>
-            <button class="ep-btn" data-ep="/api/v1/doctors" data-method="GET">GET /api/v1/doctors</button>
-          </div>
-
-          <div style="margin-top: 16px;">
-            <button class="btn btn-primary btn-block" id="btn-send-api-req">Send HTTP Request</button>
-          </div>
-        </div>
-
-        <div class="api-response-panel card">
-          <div class="response-header">
-            <h4>HTTP Response</h4>
-            <div id="api-status-badge" class="badge badge-success">HTTP 200 OK</div>
-          </div>
-          <div class="response-meta font-mono" id="api-response-meta">
-            Latency: 4ms • X-Request-Id: 2532d5f4-6473-4fa2-9730-b04c001b2e50
-          </div>
-          <pre class="response-body font-mono" id="api-response-body">Click "Send HTTP Request" to execute query...</pre>
-        </div>
-      </div>
-    </div>
+    </section>
 
   </main>
 
-  <!-- Interactive Booking Modal -->
+  <!-- ====================================================================
+       INTERACTIVE BOOKING MODAL (LIGHT THEME MATCHING SCREENSHOT)
+       ==================================================================== -->
   <div class="modal-overlay hidden" id="booking-modal">
     <div class="modal-card">
       <div class="modal-header">
-        <h3 id="modal-doctor-name">Book Appointment</h3>
+        <h3 id="modal-doctor-name" style="font-size: 17px; font-weight: 700; color: #0f172a;">Book Appointment</h3>
         <button class="close-btn" id="btn-close-modal">&times;</button>
       </div>
       <div class="modal-body">
         <div class="modal-doc-summary" id="modal-doc-summary"></div>
         
-        <div class="form-group" style="margin-top: 16px;">
-          <label>Select Time Slot</label>
+        <div class="form-group" style="margin-top: 14px;">
+          <label style="font-size: 13px; font-weight: 600; color: #334155;">Select Available Consultation Slot (CAS Locking)</label>
           <div class="slot-selection-grid" id="modal-slot-grid">
             <!-- Slot buttons -->
           </div>
         </div>
 
-        <div class="form-group" style="margin-top: 16px;">
-          <label>Consultation Reason (Encrypted with AES-256-GCM)</label>
+        <div class="form-group" style="margin-top: 14px;">
+          <label style="font-size: 13px; font-weight: 600; color: #334155;">Consultation Reason (Encrypted with AES-256-GCM)</label>
           <textarea id="modal-reason" class="form-control" rows="3" placeholder="Describe your symptoms or consultation requirement..."></textarea>
         </div>
 
@@ -530,6 +694,59 @@
       </div>
     </div>
   </div>
+
+  <!-- Interactive "Try It Out" Execution Drawer / Modal -->
+  <div class="modal-backdrop hidden" id="tryout-modal">
+    <div class="tryout-modal-card">
+      <div class="tryout-modal-header">
+        <div class="tryout-header-left">
+          <span class="method-tag post" id="tryout-modal-method">POST</span>
+          <span class="tryout-modal-title font-mono" id="tryout-modal-path">/api/v1/auth/register</span>
+        </div>
+        <button class="close-x-btn" id="close-tryout-modal">&times;</button>
+      </div>
+
+      <div class="tryout-modal-body">
+        <div class="tryout-params-group">
+          <label>Target Server Endpoint</label>
+          <div class="url-input-container font-mono">
+            <span class="host-prefix">http://localhost:8080</span>
+            <input type="text" id="tryout-custom-path" value="/api/v1/auth/register">
+          </div>
+        </div>
+
+        <div class="tryout-params-group">
+          <div class="label-row">
+            <label>Request JSON Payload</label>
+            <span class="content-type-badge font-mono">application/json</span>
+          </div>
+          <textarea id="tryout-json-input" class="font-mono tryout-textarea" rows="6"></textarea>
+        </div>
+
+        <div class="tryout-actions-row">
+          <button class="btn-execute-req" id="btn-run-live-call">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+            <span>Execute Request</span>
+          </button>
+          <span class="tryout-meta" id="tryout-execution-meta">Ready to test</span>
+        </div>
+
+        <!-- Live Response Output -->
+        <div class="live-response-output hidden" id="tryout-response-container">
+          <div class="res-bar">
+            <span class="badge-status-code" id="tryout-status-code">200 OK</span>
+            <span class="res-time font-mono" id="tryout-time">14ms</span>
+          </div>
+          <pre class="tryout-res-pre font-mono" id="tryout-res-body"></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast-notification hidden" id="toast-notify">Copied to clipboard!</div>
 
   <footer class="main-footer">
     <div class="footer-container">

@@ -1,7 +1,9 @@
-// Amrutam Telemedicine Client Logic
+// Amrutam Telemedicine Platform & API Portal Client Logic
 'use strict';
 
-// Mock Seed Doctors data matching PostgreSQL schema
+// ============================================================================
+// 1. DOCTORS DATA & BOOKING CATALOG
+// ============================================================================
 const DOCTORS = [
   {
     id: 'd1-asha-verma',
@@ -110,25 +112,270 @@ let AUDIT_LOGS = [
   }
 ];
 
+// ============================================================================
+// 2. API ENDPOINTS REGISTRY FOR TAB 5
+// ============================================================================
+const ENDPOINTS_DATA = {
+  'post-api-auth-register': {
+    id: 'post-api-auth-register',
+    method: 'POST',
+    path: '/api/auth/register',
+    fullUrl: 'http://localhost:8080/api/v1/auth/register',
+    summary: 'Register a new user account',
+    description: 'Register a new user (patient or doctor) in the system.',
+    requestBody: {
+      "name": "John Doe",
+      "email": "john@example.com",
+      "password": "SecurePassword123",
+      "role": "patient",
+      "phone": "+91 9876543210",
+      "dateOfBirth": "2000-01-01",
+      "gender": "male"
+    },
+    responses: {
+      '201': {
+        desc: 'User registered successfully',
+        body: {
+          "success": true,
+          "message": "User registered successfully",
+          "data": {
+            "id": "64f2c1e9b2a1d5e4f8c9a123",
+            "name": "John Doe",
+            "email": "john@example.com",
+            "role": "patient",
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NGYyYzFlOWIyYTFkNWU0ZjhjOWExMjMiLCJyb2xlIjoicGF0aWVudCJ9..."
+          }
+        }
+      },
+      '400': {
+        desc: 'Validation error: invalid email or weak password',
+        body: { "error": "BAD_REQUEST", "message": "Validation failed" }
+      },
+      '409': {
+        desc: 'Conflict: email already registered',
+        body: { "error": "CONFLICT", "message": "An account with this email already exists" }
+      },
+      '500': {
+        desc: 'Internal server error',
+        body: { "error": "INTERNAL_SERVER_ERROR", "message": "Service unavailable" }
+      }
+    }
+  },
+
+  'post-api-auth-login': {
+    id: 'post-api-auth-login',
+    method: 'POST',
+    path: '/api/auth/login',
+    fullUrl: 'http://localhost:8080/api/v1/auth/login',
+    summary: 'Login and receive JWT token',
+    description: 'Authenticate user credentials and return an access token and refresh token.',
+    requestBody: {
+      "email": "john@example.com",
+      "password": "SecurePassword123"
+    },
+    responses: {
+      '200': {
+        desc: 'Authentication successful',
+        body: {
+          "success": true,
+          "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+          "refreshToken": "rf_920194bc02814fa82910471",
+          "expiresIn": 900,
+          "user": { "id": "u-patient-001", "email": "john@example.com", "role": "patient" }
+        }
+      },
+      '401': {
+        desc: 'Invalid credentials',
+        body: { "error": "UNAUTHORIZED", "message": "Invalid email or password" }
+      }
+    }
+  },
+
+  'post-api-auth-refresh': {
+    id: 'post-api-auth-refresh',
+    method: 'POST',
+    path: '/api/auth/refresh',
+    fullUrl: 'http://localhost:8080/api/v1/auth/refresh',
+    summary: 'Refresh access token',
+    description: 'Generate a new short-lived JWT access token using a valid refresh token.',
+    requestBody: { "refreshToken": "rf_920194bc02814fa82910471" },
+    responses: {
+      '200': {
+        desc: 'Access token renewed',
+        body: { "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.new...", "expiresIn": 900 }
+      }
+    }
+  },
+
+  'get-api-users-me': {
+    id: 'get-api-users-me',
+    method: 'GET',
+    path: '/api/users/me',
+    fullUrl: 'http://localhost:8080/api/v1/users/me',
+    summary: 'Get current user profile',
+    description: 'Retrieve profile attributes and consultation history for authenticated user.',
+    requestBody: null,
+    responses: {
+      '200': {
+        desc: 'User profile retrieved',
+        body: {
+          "id": "u-patient-001",
+          "name": "John Doe",
+          "email": "john@example.com",
+          "role": "patient",
+          "phone": "+91 9876543210"
+        }
+      }
+    }
+  },
+
+  'put-api-users-me': {
+    id: 'put-api-users-me',
+    method: 'PUT',
+    path: '/api/users/me',
+    fullUrl: 'http://localhost:8080/api/v1/users/me',
+    summary: 'Update user profile',
+    description: 'Update phone number, address, or notification preferences.',
+    requestBody: { "name": "John Doe", "phone": "+91 9876543210" },
+    responses: {
+      '200': {
+        desc: 'Profile updated successfully',
+        body: { "success": true, "message": "Profile updated" }
+      }
+    }
+  },
+
+  'get-api-doctors': {
+    id: 'get-api-doctors',
+    method: 'GET',
+    path: '/api/doctors',
+    fullUrl: 'http://localhost:8080/api/v1/doctors',
+    summary: 'Get all available doctors',
+    description: 'Returns catalog of verified Ayurvedic, Kayachikitsa and Panchakarma specialists.',
+    requestBody: null,
+    responses: {
+      '200': {
+        desc: 'Doctors catalog list',
+        body: {
+          "total": 4,
+          "doctors": DOCTORS.map(d => ({ id: d.id, name: d.name, specialization: d.specialization, fee: d.fee, rating: d.rating }))
+        }
+      }
+    }
+  },
+
+  'get-api-doctors-availability': {
+    id: 'get-api-doctors-availability',
+    method: 'GET',
+    path: '/api/doctors/{id}/availability',
+    fullUrl: 'http://localhost:8080/api/v1/doctors/d1-asha-verma/availability',
+    summary: 'Get doctor availability slots',
+    description: 'Check active, unheld and unbooked appointment slots for a doctor with race-free locking.',
+    requestBody: null,
+    responses: {
+      '200': {
+        desc: 'Available consultation slots',
+        body: {
+          "doctorId": "d1-asha-verma",
+          "availableSlots": [
+            { "slotId": "slot-1030", "time": "10:30 AM", "status": "AVAILABLE" },
+            { "slotId": "slot-1400", "time": "02:00 PM", "status": "AVAILABLE" }
+          ]
+        }
+      }
+    }
+  },
+
+  'post-api-bookings': {
+    id: 'post-api-bookings',
+    method: 'POST',
+    path: '/api/bookings',
+    fullUrl: 'http://localhost:8080/api/v1/consultations',
+    summary: 'Create a new booking',
+    description: 'Initiate race-free booking saga with slot compare-and-set and 10-minute hold window.',
+    requestBody: {
+      "slotId": "slot-1030",
+      "reason": "Digestive issues and seasonal Panchakarma consultation"
+    },
+    responses: {
+      '201': {
+        desc: 'Booking held (Saga initialized)',
+        body: {
+          "consultationId": "c-9821-4820",
+          "status": "HOLD",
+          "holdExpiresAt": "2026-10-27T06:10:00Z",
+          "payment": { "amount": 750, "currency": "INR", "providerRef": "pay_mock_98214" }
+        }
+      },
+      '409': {
+        desc: 'Slot conflict: already held or booked',
+        body: { "error": "SLOT_CONFLICT", "message": "Selected time slot is no longer available" }
+      }
+    }
+  },
+
+  'get-api-bookings-id': {
+    id: 'get-api-bookings-id',
+    method: 'GET',
+    path: '/api/bookings/{id}',
+    fullUrl: 'http://localhost:8080/api/v1/consultations/c-9821-4820',
+    summary: 'Get booking details',
+    description: 'Retrieve current consultation status, payment receipt, and video room token.',
+    requestBody: null,
+    responses: {
+      '200': {
+        desc: 'Consultation booking record',
+        body: {
+          "id": "c-9821-4820",
+          "status": "CONFIRMED",
+          "doctor": { "name": "Dr. Asha Verma", "fee": 750 },
+          "roomUrl": "https://meet.amrutam.com/room-c-9821-4820"
+        }
+      }
+    }
+  },
+
+  'post-api-bookings-cancel': {
+    id: 'post-api-bookings-cancel',
+    method: 'POST',
+    path: '/api/bookings/{id}/cancel',
+    fullUrl: 'http://localhost:8080/api/v1/consultations/c-9821-4820/cancel',
+    summary: 'Cancel booking',
+    description: 'Cancel scheduled consultation and trigger automated compensation refund.',
+    requestBody: { "reason": "Patient requested cancellation" },
+    responses: {
+      '200': {
+        desc: 'Booking cancelled & refund queued',
+        body: { "status": "CANCELLED", "refundStatus": "QUEUED", "refundAmount": 750 }
+      }
+    }
+  }
+};
+
+let currentEndpoint = ENDPOINTS_DATA['post-api-auth-register'];
+let currentStatus = '201';
+
 // Helper to generate unique Idempotency Keys
 function generateIdemKey() {
   return 'idem-' + Math.floor(10000 + Math.random() * 90000) + '-' + Math.random().toString(36).substring(2, 7);
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  initTabs();
-  renderDoctors(DOCTORS);
-  initDoctorFilters();
-  initPrescriptionToggle();
-  renderAuditLogs();
-  initAuditActions();
-  initApiPlayground();
-  initBookingModal();
-});
+// Toast Notification Helper
+function showToast(message) {
+  const toast = document.getElementById('toast-notify');
+  if (!toast) return;
+  toast.textContent = message;
+  toast.classList.remove('hidden');
+  setTimeout(() => {
+    toast.classList.add('hidden');
+  }, 2200);
+}
 
-// TAB SWITCHING
+// ============================================================================
+// 3. TAB NAVIGATION (FIND DOCTORS, CONSULTATIONS, SECURITY, ANALYTICS, API)
+// ============================================================================
 function initTabs() {
-  const navBtns = document.querySelectorAll('.nav-btn');
+  const navBtns = document.querySelectorAll('.nav-tab-btn');
   const panes = document.querySelectorAll('.tab-pane');
 
   navBtns.forEach(btn => {
@@ -142,30 +389,39 @@ function initTabs() {
       if (targetPane) targetPane.classList.add('active');
     });
   });
+
+  const brandHome = document.getElementById('brand-home-trigger');
+  if (brandHome) {
+    brandHome.addEventListener('click', () => {
+      navBtns[0]?.click();
+    });
+  }
 }
 
-// DOCTORS RENDERING
+// ============================================================================
+// 4. TAB 1: DOCTORS RENDERING & FILTERING
+// ============================================================================
 function renderDoctors(doctors) {
   const container = document.getElementById('doctors-list');
   if (!container) return;
 
   if (doctors.length === 0) {
-    container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted);">No doctors found matching the search criteria.</div>';
+    container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted); background: #ffffff; border-radius: 12px; border: 1px solid var(--border-subtle);">No doctors found matching your criteria.</div>';
     return;
   }
 
   container.innerHTML = doctors.map(doc => `
-    <div class="card doctor-card">
+    <div class="doctor-card">
       <div>
         <div class="doc-header">
           <div class="doc-avatar">🌿</div>
           <div>
             <div class="doc-name">
               ${doc.name}
-              ${doc.verified ? '<span class="verified-icon" title="Verified Ayurvedic Practitioner"><svg width="18" height="18" viewBox="0 0 24 24" fill="#10b981"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></span>' : ''}
+              ${doc.verified ? '<span title="Verified Ayurvedic Practitioner"><svg width="18" height="18" viewBox="0 0 24 24" fill="#059669"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></span>' : ''}
             </div>
             <div class="doc-specialty">${doc.specialization} • ${doc.qualifications}</div>
-            <div class="doc-experience">⭐ ${doc.rating} (${doc.ratingCount} reviews) • ${doc.experienceYears} Years Experience</div>
+            <div class="doc-experience">⭐ ${doc.rating} (${doc.ratingCount} reviews) • ${doc.experienceYears} Years Exp</div>
           </div>
         </div>
 
@@ -178,7 +434,7 @@ function renderDoctors(doctors) {
         <div class="slots-container">
           <div class="slots-label">
             <span>Available Slots (Today & Tomorrow)</span>
-            <span style="color: var(--emerald-light); font-size: 0.75rem;">CAS Protected</span>
+            <span style="color: #059669; font-size: 11px; font-weight: 700;">CAS Protected</span>
           </div>
           <div class="slots-grid">
             ${doc.slots.map(s => `<button class="slot-btn" onclick="openBookingModal('${doc.id}', '${s}')">${s}</button>`).join('')}
@@ -201,13 +457,13 @@ function renderDoctors(doctors) {
 
 function initDoctorFilters() {
   const searchInput = document.getElementById('doctor-search-input');
-  const specPills = document.querySelectorAll('#specialization-filters .pill');
+  const specPills = document.querySelectorAll('#specialization-filters .pill-btn');
 
   let currentSpec = 'all';
   let searchQuery = '';
 
   function applyFilters() {
-    let filtered = DOCTORS.filter(d => {
+    const filtered = DOCTORS.filter(d => {
       const matchesSpec = currentSpec === 'all' || d.specialization.toLowerCase() === currentSpec.toLowerCase();
       const matchesSearch = searchQuery === '' || 
         d.name.toLowerCase().includes(searchQuery) || 
@@ -233,9 +489,86 @@ function initDoctorFilters() {
       applyFilters();
     });
   });
+
+  // Global header search input also filters doctors or jumps
+  const globalSearch = document.getElementById('global-search-input');
+  if (globalSearch) {
+    globalSearch.addEventListener('input', (e) => {
+      searchQuery = e.target.value.toLowerCase().trim();
+      document.querySelector('.nav-tab-btn[data-tab="doctors"]')?.click();
+      if (searchInput) searchInput.value = searchQuery;
+      applyFilters();
+    });
+  }
 }
 
-// PRESCRIPTION ENCRYPTION / DECRYPTION TOGGLE
+// ============================================================================
+// 5. INTERACTIVE BOOKING MODAL
+// ============================================================================
+let currentBookingDoc = null;
+let selectedSlotTime = null;
+
+function openBookingModal(docId, slotTime) {
+  const doc = DOCTORS.find(d => d.id === docId);
+  if (!doc) return;
+  currentBookingDoc = doc;
+  selectedSlotTime = slotTime;
+
+  document.getElementById('modal-doctor-name').textContent = `Book Appointment with ${doc.name}`;
+  document.getElementById('modal-doc-summary').innerHTML = `
+    <div style="font-size: 13.5px; color: #475569;">
+      Specialization: <strong>${doc.specialization}</strong> • Consultation Fee: <strong style="color:#0f172a;">₹${doc.fee} (INR)</strong>
+    </div>
+  `;
+
+  const slotGrid = document.getElementById('modal-slot-grid');
+  slotGrid.innerHTML = doc.slots.map(s => `
+    <button class="modal-slot-pill ${s === slotTime ? 'selected' : ''}" onclick="selectModalSlot('${s}')">${s}</button>
+  `).join('');
+
+  document.getElementById('modal-idem-key').textContent = generateIdemKey();
+  document.getElementById('booking-modal').classList.remove('hidden');
+}
+
+function selectModalSlot(slot) {
+  selectedSlotTime = slot;
+  document.querySelectorAll('.modal-slot-pill').forEach(pill => {
+    pill.classList.toggle('selected', pill.textContent === slot);
+  });
+}
+
+function initBookingModal() {
+  const modal = document.getElementById('booking-modal');
+  const closeBtn = document.getElementById('btn-close-modal');
+  const cancelBtn = document.getElementById('btn-cancel-booking');
+  const confirmBtn = document.getElementById('btn-confirm-booking');
+
+  const closeModal = () => modal.classList.add('hidden');
+
+  if (closeBtn) closeBtn.addEventListener('click', closeModal);
+  if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+
+  if (confirmBtn) {
+    confirmBtn.addEventListener('click', () => {
+      confirmBtn.disabled = true;
+      confirmBtn.textContent = 'Processing Distributed Saga...';
+
+      setTimeout(() => {
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = 'Confirm & Hold Slot (Saga)';
+        closeModal();
+        alert(`Success! Consultation held and confirmed with ${currentBookingDoc.name} for ${selectedSlotTime}.\n\n• Slot Compare-and-Set: SUCCESS\n• Idempotency-Key validated\n• Webhook payment verified\n• Status: CONFIRMED`);
+      }, 550);
+    });
+  }
+}
+
+window.openBookingModal = openBookingModal;
+window.selectModalSlot = selectModalSlot;
+
+// ============================================================================
+// 6. TAB 2: PRESCRIPTION ENCRYPTION / DECRYPTION TOGGLE
+// ============================================================================
 function initPrescriptionToggle() {
   const toggleBtn = document.getElementById('btn-toggle-decrypt');
   const rawCipher = document.getElementById('rx-raw-cipher');
@@ -249,20 +582,20 @@ function initPrescriptionToggle() {
         rawCipher.classList.add('hidden');
         decryptedView.classList.remove('hidden');
         toggleBtn.innerHTML = '🔒 Show Raw Ciphertext';
-        toggleBtn.classList.remove('btn-decrypt');
-        toggleBtn.classList.add('btn-secondary');
+        toggleBtn.className = 'btn btn-secondary';
       } else {
         rawCipher.classList.remove('hidden');
         decryptedView.classList.add('hidden');
         toggleBtn.innerHTML = '<span class="lock-icon">🔒</span> Decrypt PHI';
-        toggleBtn.classList.remove('btn-secondary');
-        toggleBtn.classList.add('btn-decrypt');
+        toggleBtn.className = 'btn btn-primary';
       }
     });
   }
 }
 
-// AUDIT LOGS HASH CHAIN
+// ============================================================================
+// 7. TAB 3: AUDIT CHAIN VERIFICATION & SIMULATION
+// ============================================================================
 function renderAuditLogs() {
   const container = document.getElementById('audit-chain-stream');
   if (!container) return;
@@ -271,12 +604,12 @@ function renderAuditLogs() {
     <div class="audit-block" id="audit-log-${log.id}">
       <div class="audit-block-top">
         <span>#${log.id} • ${log.action}</span>
-        <span style="font-size: 0.75rem; color: var(--text-muted);">${log.ts}</span>
+        <span style="font-size: 11px; color: var(--text-muted); font-weight: 500;">${log.ts}</span>
       </div>
       <div class="audit-hash-row">
         <div><strong>Actor:</strong> ${log.actor} (${log.ip})</div>
         <div class="font-mono" style="word-break: break-all;"><strong>prev_hash:</strong> ${log.prev_hash}</div>
-        <div class="font-mono" style="color: var(--emerald-light); word-break: break-all;"><strong>hash:</strong> ${log.hash}</div>
+        <div class="font-mono" style="color: #059669; word-break: break-all;"><strong>hash:</strong> ${log.hash}</div>
       </div>
     </div>
   `).join('');
@@ -307,129 +640,290 @@ function initAuditActions() {
           badge.textContent = 'TAMPER DETECTED: HASH MISMATCH AT BLOCK #3';
           badge.className = 'badge badge-danger';
         }
-      }, 400);
+      }, 350);
     });
   }
 
   if (tamperBtn && badge) {
     tamperBtn.addEventListener('click', () => {
-      // Simulate an attacker modifying metadata of log 3
       AUDIT_LOGS[2].hash = 'tampered_deadbeef_000000000000000000000000000000000000000000000000';
       renderAuditLogs();
       badge.textContent = 'TAMPER DETECTED: HASH MISMATCH AT BLOCK #3';
       badge.className = 'badge badge-danger';
-      alert('Simulated Attack: A DBA altered row #3. The SHA-256 chain verifier immediately detected the tampering because row #4 prev_hash does not match!');
+      alert('Simulated Attack: A malicious user or script altered row #3. The SHA-256 chain verifier immediately detected the tampering because row #4 prev_hash does not match!');
     });
   }
 }
 
-// API PLAYGROUND
-function initApiPlayground() {
-  const epBtns = document.querySelectorAll('.endpoint-btns .ep-btn');
-  const sendBtn = document.getElementById('btn-send-api-req');
-  const bodyEl = document.getElementById('api-response-body');
-  const statusBadge = document.getElementById('api-status-badge');
-  const metaEl = document.getElementById('api-response-meta');
+// ============================================================================
+// 8. TAB 5: API DOCUMENTATION & INSPECTOR (SCREENSHOT SPEC)
+// ============================================================================
+function highlightJson(obj) {
+  if (!obj) return '';
+  const jsonStr = JSON.stringify(obj, null, 2);
+  return jsonStr
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+      let cls = 'json-num';
+      if (/^"/.test(match)) {
+        if (/:$/.test(match)) {
+          cls = 'json-key';
+        } else {
+          cls = 'json-str';
+        }
+      } else if (/true|false/.test(match)) {
+        cls = 'json-bool';
+      }
+      return '<span class="' + cls + '">' + match + '</span>';
+    });
+}
 
-  let selectedEndpoint = '/healthz';
+function countLines(text) {
+  if (!text) return 1;
+  return (text.match(/\n/g) || []).length + 1;
+}
 
-  epBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      epBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      selectedEndpoint = btn.getAttribute('data-ep');
+function generateLineNumbers(count) {
+  let lines = '';
+  for (let i = 1; i <= count; i++) {
+    lines += i + '<br>';
+  }
+  return lines;
+}
+
+function renderApiEndpoint(endpoint) {
+  currentEndpoint = endpoint;
+
+  const methodTag = document.getElementById('insp-method-tag');
+  if (methodTag) {
+    methodTag.textContent = endpoint.method;
+    methodTag.className = `method-tag ${endpoint.method.toLowerCase()}`;
+  }
+
+  const inspPath = document.getElementById('insp-path');
+  if (inspPath) inspPath.textContent = endpoint.path;
+
+  const inspSub = document.getElementById('insp-sub');
+  if (inspSub) inspSub.textContent = endpoint.summary;
+
+  const inspBanner = document.getElementById('insp-banner');
+  if (inspBanner) inspBanner.textContent = endpoint.description;
+
+  const inspUrl = document.getElementById('insp-request-url');
+  if (inspUrl) inspUrl.textContent = endpoint.fullUrl;
+
+  // Request Body
+  const reqSection = document.getElementById('req-body-section');
+  if (reqSection) {
+    if (endpoint.requestBody) {
+      reqSection.style.display = 'flex';
+      const jsonFormatted = JSON.stringify(endpoint.requestBody, null, 2);
+      const lineCount = countLines(jsonFormatted);
+      document.getElementById('req-line-numbers').innerHTML = generateLineNumbers(lineCount);
+      document.getElementById('insp-request-body').innerHTML = `<code>${highlightJson(endpoint.requestBody)}</code>`;
+    } else {
+      reqSection.style.display = 'none';
+    }
+  }
+
+  // Responses Status Pills
+  const pillsContainer = document.getElementById('response-status-pills');
+  if (pillsContainer) {
+    pillsContainer.innerHTML = '';
+    const statusCodes = Object.keys(endpoint.responses);
+    currentStatus = statusCodes[0];
+
+    statusCodes.forEach((status, idx) => {
+      const pill = document.createElement('button');
+      pill.className = `status-pill ${idx === 0 ? 'active' : ''}`;
+      pill.dataset.status = status;
+      const isSuccess = status.startsWith('2');
+      pill.textContent = `${status} ${isSuccess ? 'Success' : status === '400' ? 'Bad Request' : status === '409' ? 'Conflict' : 'Error'}`;
+      pill.addEventListener('click', () => switchResponseStatus(status));
+      pillsContainer.appendChild(pill);
+    });
+
+    renderResponseContent(currentStatus);
+  }
+
+  // Active state in sidebar
+  document.querySelectorAll('.api-nav-link').forEach(link => {
+    link.classList.toggle('active', link.dataset.endpointId === endpoint.id);
+  });
+}
+
+function switchResponseStatus(status) {
+  currentStatus = status;
+  document.querySelectorAll('#response-status-pills .status-pill').forEach(pill => {
+    pill.classList.toggle('active', pill.dataset.status === status);
+  });
+  renderResponseContent(status);
+}
+
+function renderResponseContent(status) {
+  const respData = currentEndpoint.responses[status];
+  if (!respData) return;
+
+  const descEl = document.getElementById('status-desc-text');
+  if (descEl) descEl.textContent = respData.desc;
+
+  const jsonFormatted = JSON.stringify(respData.body, null, 2);
+  const lineCount = countLines(jsonFormatted);
+  const lineNumbers = document.getElementById('res-line-numbers');
+  if (lineNumbers) lineNumbers.innerHTML = generateLineNumbers(lineCount);
+
+  const resBody = document.getElementById('insp-response-body');
+  if (resBody) resBody.innerHTML = `<code>${highlightJson(respData.body)}</code>`;
+}
+
+function initApiDocs() {
+  document.querySelectorAll('.api-nav-link').forEach(link => {
+    link.addEventListener('click', () => {
+      const epId = link.dataset.endpointId;
+      if (ENDPOINTS_DATA[epId]) {
+        renderApiEndpoint(ENDPOINTS_DATA[epId]);
+      }
     });
   });
 
-  if (sendBtn) {
-    sendBtn.addEventListener('click', async () => {
-      bodyEl.textContent = 'Executing HTTP request to ' + selectedEndpoint + '...';
-      const startTime = performance.now();
-      try {
-        const res = await fetch(selectedEndpoint);
-        const elapsed = Math.round(performance.now() - startTime);
-        const reqId = res.headers.get('x-request-id') || 'req-' + Math.random().toString(36).substring(2, 9);
-        
-        statusBadge.textContent = `HTTP ${res.status} ${res.statusText || 'OK'}`;
-        statusBadge.className = res.ok ? 'badge badge-success' : 'badge badge-warning';
-        metaEl.textContent = `Latency: ${elapsed}ms • X-Request-Id: ${reqId}`;
+  // Copy Buttons
+  const copyUrlBtn = document.getElementById('btn-copy-url');
+  if (copyUrlBtn) {
+    copyUrlBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText(currentEndpoint.fullUrl);
+      showToast('Request URL copied!');
+    });
+  }
 
-        const contentType = res.headers.get('content-type') || '';
-        if (contentType.includes('application/json')) {
-          const json = await res.json();
-          bodyEl.textContent = JSON.stringify(json, null, 2);
-        } else {
-          const text = await res.text();
-          bodyEl.textContent = text.substring(0, 1500) + (text.length > 1500 ? '\n... [truncated]' : '');
+  const copyBodyBtn = document.getElementById('btn-copy-req-body');
+  if (copyBodyBtn) {
+    copyBodyBtn.addEventListener('click', () => {
+      if (currentEndpoint.requestBody) {
+        navigator.clipboard.writeText(JSON.stringify(currentEndpoint.requestBody, null, 2));
+        showToast('Request JSON body copied!');
+      }
+    });
+  }
+
+  // Inspector Tabs
+  document.querySelectorAll('.insp-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.insp-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const tabName = tab.dataset.tab;
+      const banner = document.getElementById('insp-banner');
+      if (!banner) return;
+      if (tabName === 'overview') banner.textContent = currentEndpoint.description;
+      else if (tabName === 'request') banner.textContent = 'Headers: Content-Type: application/json • Rate-limit: 60/min • Idempotency-Key supported';
+      else if (tabName === 'response') banner.textContent = 'Responses are formatted in RFC 7807 with X-Request-Id header for distributed audit tracing.';
+      else if (tabName === 'auth') banner.textContent = 'Authorization: Bearer <JWT_ACCESS_TOKEN> • RBAC scopes: Patient, Doctor, Admin';
+      else if (tabName === 'code') banner.textContent = `cURL, Fetch API and Python requests examples for ${currentEndpoint.path}`;
+    });
+  });
+
+  // Try it out modal drawer
+  const tryoutBtn = document.getElementById('btn-try-it-out');
+  const closeTryoutBtn = document.getElementById('close-tryout-modal');
+  const tryoutModal = document.getElementById('tryout-modal');
+  const runLiveBtn = document.getElementById('btn-run-live-call');
+
+  if (tryoutBtn && tryoutModal) {
+    tryoutBtn.addEventListener('click', () => {
+      tryoutModal.classList.remove('hidden');
+      document.getElementById('tryout-modal-method').textContent = currentEndpoint.method;
+      document.getElementById('tryout-modal-method').className = `method-tag ${currentEndpoint.method.toLowerCase()}`;
+      document.getElementById('tryout-modal-path').textContent = currentEndpoint.path;
+      document.getElementById('tryout-custom-path').value = currentEndpoint.fullUrl.replace('http://localhost:8080', '');
+      document.getElementById('tryout-json-input').value = currentEndpoint.requestBody ? JSON.stringify(currentEndpoint.requestBody, null, 2) : '';
+      document.getElementById('tryout-response-container').classList.add('hidden');
+      document.getElementById('tryout-execution-meta').textContent = 'Ready to test';
+    });
+  }
+
+  if (closeTryoutBtn && tryoutModal) {
+    closeTryoutBtn.addEventListener('click', () => {
+      tryoutModal.classList.add('hidden');
+    });
+  }
+
+  if (runLiveBtn) {
+    runLiveBtn.addEventListener('click', async () => {
+      const meta = document.getElementById('tryout-execution-meta');
+      const resContainer = document.getElementById('tryout-response-container');
+      const resCode = document.getElementById('tryout-status-code');
+      const resTime = document.getElementById('tryout-time');
+      const resBody = document.getElementById('tryout-res-body');
+
+      meta.textContent = 'Executing HTTP request...';
+      const startTime = performance.now();
+      const customPath = document.getElementById('tryout-custom-path').value.trim();
+      const rawBody = document.getElementById('tryout-json-input').value.trim();
+
+      try {
+        const options = {
+          method: currentEndpoint.method,
+          headers: { 'Content-Type': 'application/json' }
+        };
+        if (currentEndpoint.method !== 'GET' && rawBody) {
+          options.body = rawBody;
         }
+
+        const response = await fetch(customPath, options);
+        const duration = Math.round(performance.now() - startTime);
+        const data = await response.json().catch(() => ({ status: response.statusText }));
+
+        resContainer.classList.remove('hidden');
+        resCode.textContent = `${response.status} ${response.statusText}`;
+        resCode.style.color = response.ok ? '#059669' : '#dc2626';
+        resCode.style.backgroundColor = response.ok ? '#ecfdf5' : '#fef2f2';
+        resTime.textContent = `${duration}ms`;
+        resBody.textContent = JSON.stringify(data, null, 2);
+        meta.textContent = `Completed with status ${response.status}`;
       } catch (err) {
-        statusBadge.textContent = 'Network Error';
-        statusBadge.className = 'badge badge-danger';
-        bodyEl.textContent = `Error connecting to ${selectedEndpoint}: ${err.message}`;
+        const duration = Math.round(performance.now() - startTime) || 10;
+        resContainer.classList.remove('hidden');
+        resCode.textContent = '200 OK (Simulation)';
+        resCode.style.color = '#059669';
+        resCode.style.backgroundColor = '#ecfdf5';
+        resTime.textContent = `${duration}ms`;
+        resBody.textContent = JSON.stringify(currentEndpoint.responses['200']?.body || currentEndpoint.responses['201']?.body, null, 2);
+        meta.textContent = 'Request completed (Mock Pipeline)';
       }
     });
   }
 }
 
-// BOOKING MODAL
-let currentBookingDoc = null;
-let selectedSlotTime = null;
-
-function openBookingModal(docId, slotTime) {
-  const doc = DOCTORS.find(d => d.id === docId);
-  if (!doc) return;
-  currentBookingDoc = doc;
-  selectedSlotTime = slotTime;
-
-  document.getElementById('modal-doctor-name').textContent = `Book with ${doc.name}`;
-  document.getElementById('modal-doc-summary').innerHTML = `
-    <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 8px;">
-      ${doc.specialization} • <strong>Fee: ₹${doc.fee} (INR)</strong>
-    </div>
-  `;
-
-  const slotGrid = document.getElementById('modal-slot-grid');
-  slotGrid.innerHTML = doc.slots.map(s => `
-    <button class="modal-slot-pill ${s === slotTime ? 'selected' : ''}" onclick="selectModalSlot('${s}')">${s}</button>
-  `).join('');
-
-  document.getElementById('modal-idem-key').textContent = generateIdemKey();
-  document.getElementById('booking-modal').classList.remove('hidden');
-}
-
-function selectModalSlot(slot) {
-  selectedSlotTime = slot;
-  document.querySelectorAll('.modal-slot-pill').forEach(pill => {
-    if (pill.textContent === slot) pill.classList.add('selected');
-    else pill.classList.remove('selected');
-  });
-}
-
-function initBookingModal() {
-  const modal = document.getElementById('booking-modal');
-  const closeBtn = document.getElementById('btn-close-modal');
-  const cancelBtn = document.getElementById('btn-cancel-booking');
-  const confirmBtn = document.getElementById('btn-confirm-booking');
-
-  const closeModal = () => modal.classList.add('hidden');
-
-  if (closeBtn) closeBtn.addEventListener('click', closeModal);
-  if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
-
-  if (confirmBtn) {
-    confirmBtn.addEventListener('click', () => {
-      confirmBtn.disabled = true;
-      confirmBtn.textContent = 'Processing Saga...';
-
-      setTimeout(() => {
-        confirmBtn.disabled = false;
-        confirmBtn.textContent = 'Confirm & Hold Slot (Saga)';
-        closeModal();
-        alert(`Success! Consultation held and confirmed with ${currentBookingDoc.name} for ${selectedSlotTime}.\n\n• Atomic CAS claim: SUCCESS\n• Idempotency-Key validated\n• Webhook payment verified\n• Consultation status: CONFIRMED`);
-      }, 600);
-    });
+// Live API Health Ping
+async function checkApiHealth() {
+  const pill = document.getElementById('api-status-indicator');
+  if (!pill) return;
+  try {
+    const res = await fetch('/healthz');
+    if (res.ok) {
+      pill.innerHTML = '<span class="status-pulse-dot"></span><span class="status-label">API Online</span>';
+      pill.style.borderColor = '#bbf7d0';
+      pill.style.color = '#15803d';
+    }
+  } catch {
+    pill.innerHTML = '<span class="status-pulse-dot" style="background:#ef4444"></span><span class="status-label">API Offline</span>';
+    pill.style.borderColor = '#fecaca';
+    pill.style.color = '#dc2626';
   }
 }
 
-window.openBookingModal = openBookingModal;
-window.selectModalSlot = selectModalSlot;
+// Initialize everything on DOM load
+window.addEventListener('DOMContentLoaded', () => {
+  initTabs();
+  renderDoctors(DOCTORS);
+  initDoctorFilters();
+  initBookingModal();
+  initPrescriptionToggle();
+  renderAuditLogs();
+  initAuditActions();
+  initApiDocs();
+  renderApiEndpoint(currentEndpoint);
+  checkApiHealth();
+  setInterval(checkApiHealth, 15000);
+});
